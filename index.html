@@ -53,21 +53,47 @@ body {
 @keyframes o1 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(5vw,-4vh) scale(1.08)} }
 @keyframes o2 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(-4vw,5vh) scale(0.92)} }
 
-/* ── SETUP SCREEN ── */
-#setup-screen {
+/* ── NO API SCREEN ── */
+#no-api-screen {
   position: relative; z-index: 10;
   min-height: 100dvh;
-  display: flex; flex-direction: column;
+  display: none;
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: calc(var(--safe-top) + 24px) 20px calc(var(--safe-bottom) + 24px);
+}
+.no-api-card {
+  width: 100%; max-width: 400px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid rgba(251,113,133,0.25);
+  border-radius: 26px;
+  padding: 40px 32px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.18);
+  text-align: center;
+  animation: cardIn 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+.no-api-icon { font-size: 48px; margin-bottom: 16px; }
+.no-api-title { font-size: 22px; font-weight: 900; color: var(--rose); margin-bottom: 10px; }
+.no-api-text { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+/* ── ADMIN LOGIN SCREEN ── */
+#admin-login-screen {
+  position: relative; z-index: 10;
+  min-height: 100dvh;
+  display: none;
+  flex-direction: column;
   align-items: center; justify-content: center;
   padding: calc(var(--safe-top) + 24px) 20px calc(var(--safe-bottom) + 24px);
 }
 
-.setup-card {
-  width: 100%; max-width: 440px;
+.admin-login-card {
+  width: 100%; max-width: 420px;
   background: rgba(255,255,255,0.06);
   backdrop-filter: var(--blur);
   -webkit-backdrop-filter: var(--blur);
-  border: 1px solid var(--border2);
+  border: 1px solid rgba(96,165,250,0.25);
   border-radius: 26px;
   padding: 40px 32px;
   box-shadow: 0 40px 100px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.18);
@@ -78,45 +104,27 @@ body {
   to   { opacity:1; transform:translateY(0) scale(1); }
 }
 
-.app-icon {
-  width: 72px; height: 72px;
-  background: linear-gradient(135deg, rgba(52,211,153,0.3), rgba(96,165,250,0.25));
-  border: 1px solid rgba(52,211,153,0.35);
+.admin-login-icon {
+  width: 68px; height: 68px;
+  background: linear-gradient(135deg, rgba(96,165,250,0.3), rgba(139,92,246,0.25));
+  border: 1px solid rgba(96,165,250,0.35);
   border-radius: 22px;
-  margin: 0 auto 20px;
+  margin: 0 auto 18px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 34px;
-  box-shadow: 0 8px 32px rgba(52,211,153,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
-  animation: iconFloat 4s ease-in-out infinite;
+  font-size: 30px;
+  box-shadow: 0 8px 32px rgba(96,165,250,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
 }
-@keyframes iconFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
-
-.setup-title {
-  font-size: 26px; font-weight: 900; text-align: center; letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #fff 30%, var(--green));
+.admin-login-title {
+  font-size: 24px; font-weight: 900; text-align: center; letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff 30%, var(--blue));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
-.setup-sub {
-  font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; margin-bottom: 10px;
-}
-.setup-sub a { color: var(--green); text-decoration: none; }
-
-/* Feature chips */
-.features {
-  display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 14px 0 24px;
-}
-.chip {
-  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
-  border-radius: 20px; padding: 5px 11px;
-  font-size: 11px; font-weight: 700; color: var(--muted);
-  letter-spacing: 0.02em;
-}
+.admin-login-sub { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 24px; }
 
 .field-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 7px; display: block; }
-
-.key-wrap { position: relative; margin-bottom: 14px; }
-.key-input {
+.field-wrap { position: relative; margin-bottom: 14px; }
+.field-input {
   width: 100%;
   background: rgba(255,255,255,0.07); border: 1px solid var(--border);
   border-radius: 14px; padding: 13px 46px 13px 16px;
@@ -125,24 +133,189 @@ body {
   backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
   -webkit-appearance: none;
 }
-.key-input::placeholder { color: var(--dim); }
-.key-input:focus { border-color: rgba(52,211,153,0.5); box-shadow: 0 0 0 3px rgba(52,211,153,0.12); background: rgba(255,255,255,0.1); }
+.field-input::placeholder { color: var(--dim); }
+.field-input:focus { border-color: rgba(96,165,250,0.5); box-shadow: 0 0 0 3px rgba(96,165,250,0.12); background: rgba(255,255,255,0.1); }
+.field-input.field-input--no-icon { padding-right: 16px; }
 
-.key-toggle { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 17px; color: var(--muted); transition: color 0.2s; }
-.key-toggle:hover { color: var(--green); }
+.field-toggle { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 17px; color: var(--muted); transition: color 0.2s; }
+.field-toggle:hover { color: var(--blue); }
 
-.btn-enter {
+.btn-admin-login {
   width: 100%; padding: 15px;
-  background: linear-gradient(135deg, rgba(52,211,153,0.55), rgba(16,185,129,0.65));
-  border: 1px solid rgba(52,211,153,0.4); border-radius: 14px;
+  background: linear-gradient(135deg, rgba(96,165,250,0.55), rgba(139,92,246,0.5));
+  border: 1px solid rgba(96,165,250,0.4); border-radius: 14px;
   color: #fff; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900;
   cursor: pointer; letter-spacing: 0.04em;
-  box-shadow: 0 4px 28px rgba(52,211,153,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
+  box-shadow: 0 4px 28px rgba(96,165,250,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
   transition: all 0.2s; -webkit-appearance: none;
 }
-.btn-enter:hover { transform: translateY(-1px); box-shadow: 0 8px 36px rgba(52,211,153,0.4), inset 0 1px 0 rgba(255,255,255,0.2); }
-.btn-enter:active { transform: scale(0.98); }
-.setup-note { font-size: 11px; color: var(--dim); text-align: center; margin-top: 14px; line-height: 1.6; }
+.btn-admin-login:hover { transform: translateY(-1px); box-shadow: 0 8px 36px rgba(96,165,250,0.4); }
+.btn-admin-login:active { transform: scale(0.98); }
+
+.admin-login-error {
+  background: rgba(251,113,133,0.1); border: 1px solid rgba(251,113,133,0.3);
+  border-radius: 10px; padding: 10px 14px;
+  font-size: 13px; font-weight: 600; color: #fda4af;
+  display: none; margin-top: 12px; text-align: center;
+}
+.admin-back-link {
+  display: block; text-align: center; margin-top: 16px;
+  font-size: 12px; color: var(--dim); cursor: pointer; text-decoration: underline;
+  transition: color 0.2s;
+}
+.admin-back-link:hover { color: var(--muted); }
+
+/* ── ADMIN PANEL ── */
+#admin-screen {
+  display: none;
+  position: relative; z-index: 10;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+
+.admin-header {
+  position: sticky; top: 0; z-index: 50;
+  padding: calc(var(--safe-top) + 12px) 20px 12px;
+  background: rgba(8,11,20,0.7);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border-bottom: 1px solid rgba(96,165,250,0.15);
+  display: flex; align-items: center; gap: 12px;
+}
+.admin-header-badge {
+  background: rgba(96,165,250,0.15); border: 1px solid rgba(96,165,250,0.3);
+  border-radius: 8px; padding: 3px 9px;
+  font-size: 10px; font-weight: 800; color: var(--blue); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.admin-header-title { font-size: 17px; font-weight: 900; color: var(--text); flex: 1; }
+.btn-admin-logout {
+  background: rgba(251,113,133,0.1); border: 1px solid rgba(251,113,133,0.25);
+  border-radius: 10px; padding: 7px 13px;
+  font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700; color: var(--rose);
+  cursor: pointer; transition: all 0.2s; -webkit-appearance: none;
+}
+.btn-admin-logout:hover { background: rgba(251,113,133,0.18); }
+
+.admin-body {
+  flex: 1; padding: 24px 16px calc(var(--safe-bottom) + 28px);
+  display: flex; flex-direction: column; gap: 18px;
+  max-width: 680px; margin: 0 auto; width: 100%;
+}
+
+.admin-section {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border); border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+}
+.admin-section-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.admin-section-title { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 7px; }
+.admin-section-body { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px rgba(52,211,153,0.6); display: inline-block; }
+.status-dot.off { background: var(--rose); box-shadow: 0 0 8px rgba(251,113,133,0.6); }
+
+.admin-key-wrap { position: relative; }
+.admin-key-input {
+  width: 100%;
+  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 46px 12px 14px;
+  color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 400;
+  outline: none; transition: all 0.2s;
+  -webkit-appearance: none;
+}
+.admin-key-input::placeholder { color: var(--dim); font-family: 'Nunito', sans-serif; }
+.admin-key-input:focus { border-color: rgba(52,211,153,0.5); box-shadow: 0 0 0 3px rgba(52,211,153,0.12); }
+
+.btn-save {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(52,211,153,0.5), rgba(16,185,129,0.6));
+  border: 1px solid rgba(52,211,153,0.35); border-radius: 12px;
+  color: #fff; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+  cursor: pointer; transition: all 0.2s; -webkit-appearance: none; white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(52,211,153,0.2);
+}
+.btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(52,211,153,0.35); }
+.btn-save:active { transform: scale(0.97); }
+.btn-save.saved { background: rgba(52,211,153,0.2); }
+
+.admin-row { display: flex; gap: 10px; align-items: flex-end; }
+.admin-row .admin-key-wrap { flex: 1; }
+
+.admin-success-msg {
+  font-size: 12px; font-weight: 700; color: var(--green);
+  display: none; animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+/* Models list */
+.models-list { display: flex; flex-direction: column; gap: 8px; }
+.model-item {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px; padding: 12px 14px;
+  transition: all 0.2s;
+}
+.model-item:hover { background: rgba(255,255,255,0.07); }
+.model-item-name { flex: 1; font-size: 13px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text); }
+.model-item-label { font-size: 11px; font-weight: 600; color: var(--dim); }
+.model-toggle {
+  position: relative; width: 40px; height: 22px; flex-shrink: 0;
+}
+.model-toggle input { opacity: 0; width: 0; height: 0; }
+.model-toggle-slider {
+  position: absolute; inset: 0; cursor: pointer;
+  background: rgba(255,255,255,0.1); border-radius: 22px; transition: 0.25s;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.model-toggle-slider::before {
+  content: ''; position: absolute;
+  width: 16px; height: 16px; border-radius: 50%; background: #fff;
+  left: 2px; top: 2px; transition: 0.25s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.model-toggle input:checked + .model-toggle-slider { background: rgba(52,211,153,0.4); border-color: rgba(52,211,153,0.5); }
+.model-toggle input:checked + .model-toggle-slider::before { transform: translateX(18px); }
+
+.model-add-row { display: flex; gap: 8px; }
+.model-add-input {
+  flex: 1;
+  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+  border-radius: 12px; padding: 11px 14px;
+  color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  outline: none; transition: all 0.2s; -webkit-appearance: none;
+}
+.model-add-input::placeholder { color: var(--dim); font-family: 'Nunito', sans-serif; font-size: 13px; }
+.model-add-input:focus { border-color: rgba(96,165,250,0.5); box-shadow: 0 0 0 3px rgba(96,165,250,0.1); }
+.btn-add-model {
+  padding: 11px 16px;
+  background: rgba(96,165,250,0.15); border: 1px solid rgba(96,165,250,0.3);
+  border-radius: 12px; color: var(--blue);
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap; -webkit-appearance: none;
+}
+.btn-add-model:hover { background: rgba(96,165,250,0.25); }
+.btn-del-model {
+  background: none; border: none; cursor: pointer;
+  font-size: 16px; color: var(--dim); transition: color 0.2s; padding: 2px 4px;
+  line-height: 1;
+}
+.btn-del-model:hover { color: var(--rose); }
+
+/* Admin credentials section */
+.cred-grid { display: flex; flex-direction: column; gap: 10px; }
+
+/* Admin info box */
+.info-box {
+  background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2);
+  border-radius: 12px; padding: 12px 14px;
+  font-size: 12px; font-weight: 600; color: rgba(96,165,250,0.8); line-height: 1.6;
+}
 
 /* ── MAIN APP ── */
 #app-screen {
@@ -152,7 +325,6 @@ body {
   flex-direction: column;
 }
 
-/* Header */
 .app-header {
   position: sticky; top: 0; z-index: 50;
   padding: calc(var(--safe-top) + 12px) 20px 12px;
@@ -176,14 +348,12 @@ body {
 }
 .model-sel option { background: #0f172a; }
 
-/* Main content */
 .app-body {
   flex: 1; padding: 20px 16px calc(var(--safe-bottom) + 24px);
   display: flex; flex-direction: column; gap: 16px;
 }
 @media(min-width:640px) { .app-body { max-width: 720px; margin: 0 auto; width: 100%; padding: 28px 24px calc(var(--safe-bottom) + 28px); } }
 
-/* Input card */
 .card {
   background: rgba(255,255,255,0.055);
   backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
@@ -191,7 +361,6 @@ body {
   box-shadow: 0 8px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
   overflow: hidden;
 }
-
 .card-header {
   padding: 14px 18px 10px;
   display: flex; align-items: center; justify-content: space-between;
@@ -199,7 +368,6 @@ body {
 }
 .card-title { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 7px; }
 .card-title span { font-size: 14px; }
-
 .char-count { font-size: 11px; font-weight: 700; color: var(--dim); font-family: 'JetBrains Mono', monospace; }
 
 #text-input {
@@ -213,7 +381,6 @@ body {
 #text-input::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 #text-input::placeholder { color: var(--dim); font-weight: 500; }
 
-/* Language row */
 .lang-row {
   padding: 10px 18px 14px;
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
@@ -226,12 +393,9 @@ body {
   font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted);
   cursor: pointer; transition: all 0.2s; -webkit-appearance: none;
 }
-.lang-btn.active {
-  background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.4); color: var(--green);
-}
+.lang-btn.active { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.4); color: var(--green); }
 .lang-btn:hover { background: rgba(255,255,255,0.1); }
 
-/* Fix button */
 .btn-fix {
   width: 100%; padding: 16px;
   background: linear-gradient(135deg, rgba(52,211,153,0.5), rgba(96,165,250,0.45));
@@ -247,99 +411,41 @@ body {
 .btn-fix:hover:not(:disabled)::before { opacity: 1; }
 .btn-fix:active:not(:disabled) { transform: scale(0.98); }
 .btn-fix:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-fix .spinner {
-  width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
-  border-radius: 50%; animation: spin 0.7s linear infinite; display: none;
-}
+.btn-fix .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .btn-fix.loading .btn-label { display: none; }
 .btn-fix.loading .spinner { display: block; }
 
-/* Result card */
 #result-card { display: none; animation: fadeUp 0.4s cubic-bezier(0.34,1.2,0.64,1) forwards; }
 @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 
-/* Corrected text */
-.result-text {
-  padding: 16px 18px;
-  font-size: 15px; font-weight: 600; line-height: 1.75;
-  color: var(--text);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
+.result-text { padding: 16px 18px; font-size: 15px; font-weight: 600; line-height: 1.75; color: var(--text); border-bottom: 1px solid rgba(255,255,255,0.06); }
 
-/* Changes list */
-.changes-header {
-  padding: 12px 18px 8px;
-  font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--muted);
-  display: flex; align-items: center; gap: 6px;
-}
-.badge {
-  background: rgba(251,191,36,0.2); border: 1px solid rgba(251,191,36,0.3);
-  border-radius: 20px; padding: 2px 8px;
-  font-size: 10px; font-weight: 800; color: var(--amber);
-}
+.changes-header { padding: 12px 18px 8px; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.badge { background: rgba(251,191,36,0.2); border: 1px solid rgba(251,191,36,0.3); border-radius: 20px; padding: 2px 8px; font-size: 10px; font-weight: 800; color: var(--amber); }
 
-.change-item {
-  margin: 0 12px 10px;
-  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px; padding: 11px 14px;
-  display: flex; flex-direction: column; gap: 5px;
-}
+.change-item { margin: 0 12px 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 11px 14px; display: flex; flex-direction: column; gap: 5px; }
 .change-row { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.4; }
 .change-before { color: var(--rose); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 12px; text-decoration: line-through; opacity: 0.8; }
 .change-arrow { color: var(--dim); font-size: 11px; margin-top: 1px; flex-shrink: 0; }
 .change-after { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 .change-reason { font-size: 12px; font-weight: 600; color: var(--muted); padding-left: 2px; }
 
-/* No changes */
-.no-changes {
-  padding: 16px 18px;
-  display: flex; align-items: center; gap: 10px;
-  font-size: 13px; font-weight: 700; color: var(--green);
-}
+.no-changes { padding: 16px 18px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: var(--green); }
 
-/* Copy / actions row */
-.result-actions {
-  padding: 12px 14px;
-  display: flex; gap: 8px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-.act-btn {
-  flex: 1; padding: 11px 8px;
-  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
-  border-radius: 12px; color: var(--muted);
-  font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
-  cursor: pointer; transition: all 0.2s; -webkit-appearance: none;
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-}
+.result-actions { padding: 12px 14px; display: flex; gap: 8px; border-top: 1px solid rgba(255,255,255,0.06); }
+.act-btn { flex: 1; padding: 11px 8px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; -webkit-appearance: none; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .act-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
 .act-btn:active { transform: scale(0.96); }
 .act-btn.success { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.35); color: var(--green); }
 
-/* Error */
-.error-box {
-  background: rgba(251,113,133,0.1); border: 1px solid rgba(251,113,133,0.25);
-  border-radius: 14px; padding: 14px 16px;
-  font-size: 13px; font-weight: 600; color: #fda4af; line-height: 1.6;
-  display: none;
-}
+.error-box { background: rgba(251,113,133,0.1); border: 1px solid rgba(251,113,133,0.25); border-radius: 14px; padding: 14px 16px; font-size: 13px; font-weight: 600; color: #fda4af; line-height: 1.6; display: none; }
 
-/* History */
 .history-section { margin-top: 4px; }
-.history-title {
-  font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--dim); margin-bottom: 10px; padding: 0 2px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.history-clear { font-size: 11px; font-weight: 700; color: var(--dim); background: none; border: none; cursor: pointer; color: var(--rose); opacity: 0.7; transition: opacity 0.2s; }
+.history-title { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; padding: 0 2px; display: flex; align-items: center; justify-content: space-between; }
+.history-clear { font-size: 11px; font-weight: 700; color: var(--rose); background: none; border: none; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
 .history-clear:hover { opacity: 1; }
-
-.hist-item {
-  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-  border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
-  cursor: pointer; transition: all 0.2s;
-}
+.hist-item { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
 .hist-item:hover { background: rgba(255,255,255,0.08); border-color: var(--border2); }
 .hist-item:active { transform: scale(0.99); }
 .hist-original { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -347,12 +453,13 @@ body {
 .hist-time { font-size: 10px; color: var(--dim); margin-top: 5px; }
 
 @media(max-width:480px) {
-  .setup-card { padding: 28px 20px; border-radius: 22px; }
+  .admin-login-card, .no-api-card { padding: 28px 20px; border-radius: 22px; }
   .app-header { padding: calc(var(--safe-top) + 10px) 14px 10px; }
   .app-body { padding: 14px 12px calc(var(--safe-bottom) + 20px); gap: 12px; }
   #text-input { font-size: 16px; min-height: 110px; }
   .result-text { font-size: 14px; }
   .change-item { margin: 0 8px 8px; }
+  .admin-body { padding: 16px 12px; }
 }
 </style>
 </head>
@@ -364,29 +471,115 @@ body {
   <div class="bg-orb"></div>
 </div>
 
-<!-- ── SETUP ── -->
-<div id="setup-screen">
-  <div class="setup-card">
-    <div class="app-icon">✍️</div>
-    <div class="setup-title">ClearText AI</div>
-    <div class="setup-sub">
-      AI що виправляє речення — грамотно, зрозуміло і з поясненням кожної помилки.<br>
-      Потрібен безкоштовний ключ: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a>
+<!-- ── NO API SCREEN ── -->
+<div id="no-api-screen">
+  <div class="no-api-card">
+    <div class="no-api-icon">⚙️</div>
+    <div class="no-api-title">Сервіс не налаштовано</div>
+    <div class="no-api-text">
+      Адміністратор ще не додав API ключ.<br>
+      Зверніться до адміністратора або перейдіть на<br>
+      <a href="/?admin" style="color:var(--blue);text-decoration:none;font-weight:700">сторінку налаштувань</a>.
     </div>
-    <div class="features">
-      <div class="chip">🇺🇦 Українська</div>
-      <div class="chip">🇷🇺 Російська</div>
-      <div class="chip">✅ Пояснення</div>
-      <div class="chip">📋 Копіювання</div>
-      <div class="chip">🕓 Історія</div>
+  </div>
+</div>
+
+<!-- ── ADMIN LOGIN SCREEN ── -->
+<div id="admin-login-screen">
+  <div class="admin-login-card">
+    <div class="admin-login-icon">🔐</div>
+    <div class="admin-login-title">Адмін-панель</div>
+    <div class="admin-login-sub">Введіть дані для входу</div>
+
+    <label class="field-label" for="adminLoginInput">Логін</label>
+    <div class="field-wrap" style="margin-bottom:14px">
+      <input type="text" class="field-input field-input--no-icon" id="adminLoginInput" placeholder="admin" autocomplete="username">
     </div>
-    <label class="field-label" for="apiKeyInput">Google API ключ</label>
-    <div class="key-wrap">
-      <input type="password" class="key-input" id="apiKeyInput" placeholder="AIzaSy...">
-      <button class="key-toggle" id="keyToggle" type="button">👁</button>
+
+    <label class="field-label" for="adminPassInput">Пароль</label>
+    <div class="field-wrap">
+      <input type="password" class="field-input" id="adminPassInput" placeholder="••••••••" autocomplete="current-password">
+      <button class="field-toggle" id="adminPassToggle" type="button">👁</button>
     </div>
-    <button class="btn-enter" id="startBtn" type="button">✦ Почати</button>
-    <div class="setup-note">🔒 Ключ не зберігається — тільки в пам'яті вкладки</div>
+
+    <button class="btn-admin-login" id="adminLoginBtn" type="button">🔓 Увійти</button>
+    <div class="admin-login-error" id="adminLoginError">❌ Невірний логін або пароль</div>
+    <a class="admin-back-link" id="adminBackLink">← Повернутись на головну</a>
+  </div>
+</div>
+
+<!-- ── ADMIN PANEL ── -->
+<div id="admin-screen">
+  <div class="admin-header">
+    <div class="admin-header-badge">ADMIN</div>
+    <div class="admin-header-title">ClearText AI — Керування</div>
+    <button class="btn-admin-logout" id="adminLogoutBtn" type="button">Вийти</button>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- API Key section -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title">
+          <span>🔑</span> Google Gemini API ключ
+          <span class="status-dot" id="apiStatusDot" style="display:none"></span>
+        </div>
+      </div>
+      <div class="admin-section-body">
+        <div class="info-box">Цей ключ використовується всіма користувачами. Не передавайте нікому доступ до цієї панелі.</div>
+        <div class="admin-row">
+          <div class="admin-key-wrap">
+            <input type="password" class="admin-key-input" id="adminApiKeyInput" placeholder="AIzaSy...">
+          </div>
+          <button class="field-toggle" id="adminApiKeyToggle" style="position:static;transform:none;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;" type="button">👁</button>
+          <button class="btn-save" id="saveApiKeyBtn" type="button">💾 Зберегти</button>
+        </div>
+        <div class="admin-success-msg" id="apiKeySavedMsg">✅ API ключ збережено!</div>
+      </div>
+    </div>
+
+    <!-- Models section -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span>🤖</span> Моделі Gemini</div>
+      </div>
+      <div class="admin-section-body">
+        <div class="models-list" id="modelsList"></div>
+        <div class="model-add-row">
+          <input type="text" class="model-add-input" id="newModelInput" placeholder="Додати модель: gemini-...">
+          <button class="btn-add-model" id="addModelBtn" type="button">+ Додати</button>
+        </div>
+        <div class="admin-success-msg" id="modelsSavedMsg">✅ Моделі збережено!</div>
+      </div>
+    </div>
+
+    <!-- Credentials section -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span>👤</span> Дані для входу в адмін-панель</div>
+      </div>
+      <div class="admin-section-body">
+        <div class="cred-grid">
+          <div>
+            <label class="field-label" for="newAdminLogin">Новий логін</label>
+            <input type="text" class="admin-key-input" id="newAdminLogin" placeholder="admin" autocomplete="off">
+          </div>
+          <div>
+            <label class="field-label" for="newAdminPass">Новий пароль</label>
+            <input type="password" class="admin-key-input" id="newAdminPass" placeholder="мінімум 6 символів" autocomplete="new-password">
+          </div>
+          <div>
+            <label class="field-label" for="newAdminPassConfirm">Підтвердити пароль</label>
+            <input type="password" class="admin-key-input" id="newAdminPassConfirm" placeholder="повторіть пароль" autocomplete="new-password">
+          </div>
+        </div>
+        <button class="btn-save" id="saveCredsBtn" type="button" style="align-self:flex-start">💾 Зберегти дані входу</button>
+        <div class="admin-success-msg" id="credsSavedMsg">✅ Дані для входу оновлено!</div>
+        <div class="error-box" id="credsErrorBox" style="display:none;margin-top:0"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -398,17 +591,10 @@ body {
       <div class="app-header-title">ClearText AI</div>
       <div class="app-header-sub">Виправлення тексту</div>
     </div>
-    <select class="model-sel" id="modelSelect">
-      <option value="gemini-2.5-flash">2.5-flash ✓</option>
-      <option value="gemini-3.1-flash-lite">3.1-lite ✓</option>
-      <option value="gemini-3-flash-preview">3-flash ✓</option>
-      <option value="gemini-2.5-pro">2.5-pro</option>
-    </select>
+    <select class="model-sel" id="modelSelect"></select>
   </div>
 
   <div class="app-body">
-
-    <!-- Input card -->
     <div class="card">
       <div class="card-header">
         <div class="card-title"><span>✏️</span> Ваш текст</div>
@@ -423,16 +609,13 @@ body {
       </div>
     </div>
 
-    <!-- Fix button -->
     <button class="btn-fix" id="fixBtn" type="button">
       <span class="btn-label">✦ Виправити текст</span>
       <div class="spinner"></div>
     </button>
 
-    <!-- Error -->
     <div class="error-box" id="errorBox"></div>
 
-    <!-- Result -->
     <div class="card" id="result-card">
       <div class="card-header">
         <div class="card-title"><span>✅</span> Виправлений текст</div>
@@ -450,7 +633,6 @@ body {
       </div>
     </div>
 
-    <!-- History -->
     <div class="history-section" id="historySection" style="display:none">
       <div class="history-title">
         <span>🕓 Останні виправлення</span>
@@ -458,41 +640,292 @@ body {
       </div>
       <div id="historyList"></div>
     </div>
-
   </div>
 </div>
 
 <script>
-let apiKey = '';
-let selectedLang = 'uk';
-let history = [];
+// ══════════════════════════════════════════════
+// STORAGE KEYS
+// ══════════════════════════════════════════════
+const KEYS = {
+  API_KEY:    'ct_api_key',
+  MODELS:     'ct_models',
+  ADMIN_USER: 'ct_admin_user',
+  ADMIN_PASS: 'ct_admin_pass',
+  ADMIN_SES:  'ct_admin_session',
+};
 
-// ── SETUP ──
-document.getElementById('keyToggle').onclick = () => {
-  const inp = document.getElementById('apiKeyInput');
+// Default admin credentials (first run)
+const DEFAULT_ADMIN = { user: 'admin', pass: 'admin123' };
+
+// Default models
+const DEFAULT_MODELS = [
+  { id: 'gemini-2.5-flash',        label: '2.5 Flash',      enabled: true  },
+  { id: 'gemini-2.0-flash',        label: '2.0 Flash',      enabled: true  },
+  { id: 'gemini-1.5-flash',        label: '1.5 Flash',      enabled: true  },
+  { id: 'gemini-2.5-pro',          label: '2.5 Pro',        enabled: false },
+];
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function lsGet(key, fallback = null) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : fallback; }
+  catch { return fallback; }
+}
+function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
+
+function getApiKey()  { return lsGet(KEYS.API_KEY, ''); }
+function getModels()  { return lsGet(KEYS.MODELS, DEFAULT_MODELS); }
+function getAdminUser(){ return lsGet(KEYS.ADMIN_USER, DEFAULT_ADMIN.user); }
+function getAdminPass(){ return lsGet(KEYS.ADMIN_PASS, DEFAULT_ADMIN.pass); }
+
+function isAdminSession() {
+  const token = sessionStorage.getItem(KEYS.ADMIN_SES);
+  return token === 'ok';
+}
+function setAdminSession(v) {
+  if (v) sessionStorage.setItem(KEYS.ADMIN_SES, 'ok');
+  else sessionStorage.removeItem(KEYS.ADMIN_SES);
+}
+
+function show(id, flex) {
+  const el = document.getElementById(id);
+  el.style.display = flex ? 'flex' : 'block';
+}
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+// ══════════════════════════════════════════════
+// ROUTING — check URL on load
+// ══════════════════════════════════════════════
+function route() {
+  const isAdmin = window.location.search === '?admin' || window.location.pathname.endsWith('?admin');
+  const params = new URLSearchParams(window.location.search);
+  const adminRoute = params.has('admin') || window.location.hash === '#admin';
+
+  // Simpler: just check if "?admin" is anywhere in the URL
+  const url = window.location.href;
+  const goAdmin = url.includes('?admin') || url.includes('/?admin');
+
+  if (goAdmin) {
+    // Admin route
+    if (isAdminSession()) {
+      showAdmin();
+    } else {
+      showAdminLogin();
+    }
+  } else {
+    // Main app route
+    const key = getApiKey();
+    if (!key) {
+      show('no-api-screen', true);
+    } else {
+      showApp();
+    }
+  }
+}
+
+// ══════════════════════════════════════════════
+// SCREENS
+// ══════════════════════════════════════════════
+function showAdminLogin() {
+  hide('no-api-screen');
+  hide('admin-screen');
+  hide('app-screen');
+  show('admin-login-screen', true);
+}
+
+function showAdmin() {
+  hide('no-api-screen');
+  hide('admin-login-screen');
+  hide('app-screen');
+  show('admin-screen', true);
+  renderAdmin();
+}
+
+function showApp() {
+  hide('no-api-screen');
+  hide('admin-login-screen');
+  hide('admin-screen');
+  show('app-screen', true);
+  renderAppModels();
+  document.getElementById('text-input').focus();
+}
+
+// ══════════════════════════════════════════════
+// ADMIN LOGIN
+// ══════════════════════════════════════════════
+document.getElementById('adminPassToggle').onclick = () => {
+  const inp = document.getElementById('adminPassInput');
   const show = inp.type === 'password';
   inp.type = show ? 'text' : 'password';
-  document.getElementById('keyToggle').textContent = show ? '🙈' : '👁';
+  document.getElementById('adminPassToggle').textContent = show ? '🙈' : '👁';
 };
 
-document.getElementById('startBtn').onclick = () => {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if (!key || key.length < 20) {
-    const inp = document.getElementById('apiKeyInput');
-    inp.style.borderColor = 'rgba(251,113,133,0.6)';
-    inp.style.boxShadow = '0 0 0 3px rgba(251,113,133,0.15)';
-    inp.animate([{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(-3px)'},{transform:'translateX(0)'}], {duration:280});
-    setTimeout(()=>{ inp.style.borderColor=''; inp.style.boxShadow=''; }, 2000);
-    return;
+document.getElementById('adminLoginBtn').onclick = doAdminLogin;
+document.getElementById('adminPassInput').addEventListener('keydown', e => { if(e.key === 'Enter') doAdminLogin(); });
+document.getElementById('adminLoginInput').addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('adminPassInput').focus(); });
+
+document.getElementById('adminBackLink').onclick = () => {
+  window.location.href = window.location.pathname;
+};
+
+function doAdminLogin() {
+  const user = document.getElementById('adminLoginInput').value.trim();
+  const pass = document.getElementById('adminPassInput').value;
+  const errBox = document.getElementById('adminLoginError');
+
+  if (user === getAdminUser() && pass === getAdminPass()) {
+    errBox.style.display = 'none';
+    setAdminSession(true);
+    showAdmin();
+  } else {
+    errBox.style.display = 'block';
+    const card = document.querySelector('.admin-login-card');
+    card.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(0)'}], {duration:300});
+    document.getElementById('adminPassInput').value = '';
+    document.getElementById('adminPassInput').focus();
   }
-  apiKey = key;
-  document.getElementById('setup-screen').style.display = 'none';
-  document.getElementById('app-screen').style.display = 'flex';
-  document.getElementById('text-input').focus();
-};
-document.getElementById('apiKeyInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('startBtn').click(); });
+}
 
-// ── LANG BUTTONS ──
+// ══════════════════════════════════════════════
+// ADMIN LOGOUT
+// ══════════════════════════════════════════════
+document.getElementById('adminLogoutBtn').onclick = () => {
+  setAdminSession(false);
+  window.location.href = window.location.pathname;
+};
+
+// ══════════════════════════════════════════════
+// ADMIN PANEL RENDER
+// ══════════════════════════════════════════════
+function renderAdmin() {
+  // API key
+  const key = getApiKey();
+  const inp = document.getElementById('adminApiKeyInput');
+  inp.value = key || '';
+  const dot = document.getElementById('apiStatusDot');
+  dot.style.display = 'inline-block';
+  dot.className = 'status-dot' + (key ? '' : ' off');
+
+  // Models
+  renderAdminModels();
+}
+
+function renderAdminModels() {
+  const models = getModels();
+  const list = document.getElementById('modelsList');
+  list.innerHTML = '';
+  models.forEach((m, i) => {
+    const item = document.createElement('div');
+    item.className = 'model-item';
+    item.innerHTML = `
+      <div style="flex:1">
+        <div class="model-item-name">${escHtml(m.id)}</div>
+        ${m.label ? `<div class="model-item-label">${escHtml(m.label)}</div>` : ''}
+      </div>
+      <label class="model-toggle">
+        <input type="checkbox" ${m.enabled ? 'checked' : ''} data-idx="${i}">
+        <span class="model-toggle-slider"></span>
+      </label>
+      <button class="btn-del-model" data-idx="${i}" title="Видалити">✕</button>`;
+    list.appendChild(item);
+  });
+
+  list.querySelectorAll('.model-toggle input').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const models = getModels();
+      models[+cb.dataset.idx].enabled = cb.checked;
+      lsSet(KEYS.MODELS, models);
+      showTmpMsg('modelsSavedMsg');
+    });
+  });
+  list.querySelectorAll('.btn-del-model').forEach(btn => {
+    btn.onclick = () => {
+      const models = getModels();
+      models.splice(+btn.dataset.idx, 1);
+      lsSet(KEYS.MODELS, models);
+      renderAdminModels();
+      showTmpMsg('modelsSavedMsg');
+    };
+  });
+}
+
+// Save API key
+document.getElementById('adminApiKeyToggle').onclick = () => {
+  const inp = document.getElementById('adminApiKeyInput');
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  document.getElementById('adminApiKeyToggle').textContent = show ? '🙈' : '👁';
+};
+
+document.getElementById('saveApiKeyBtn').onclick = () => {
+  const val = document.getElementById('adminApiKeyInput').value.trim();
+  lsSet(KEYS.API_KEY, val);
+  const dot = document.getElementById('apiStatusDot');
+  dot.className = 'status-dot' + (val ? '' : ' off');
+  showTmpMsg('apiKeySavedMsg');
+};
+
+// Add model
+document.getElementById('addModelBtn').onclick = () => {
+  const inp = document.getElementById('newModelInput');
+  const val = inp.value.trim();
+  if (!val) return;
+  const models = getModels();
+  if (models.find(m => m.id === val)) { inp.value = ''; return; }
+  models.push({ id: val, label: '', enabled: true });
+  lsSet(KEYS.MODELS, models);
+  renderAdminModels();
+  inp.value = '';
+  showTmpMsg('modelsSavedMsg');
+};
+document.getElementById('newModelInput').addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('addModelBtn').click(); });
+
+// Save credentials
+document.getElementById('saveCredsBtn').onclick = () => {
+  const login = document.getElementById('newAdminLogin').value.trim();
+  const pass  = document.getElementById('newAdminPass').value;
+  const pass2 = document.getElementById('newAdminPassConfirm').value;
+  const errBox = document.getElementById('credsErrorBox');
+  errBox.style.display = 'none';
+
+  if (!login) { errBox.textContent = '⚠️ Введіть логін'; errBox.style.display = 'block'; return; }
+  if (pass.length < 6) { errBox.textContent = '⚠️ Пароль мінімум 6 символів'; errBox.style.display = 'block'; return; }
+  if (pass !== pass2) { errBox.textContent = '⚠️ Паролі не збігаються'; errBox.style.display = 'block'; return; }
+
+  lsSet(KEYS.ADMIN_USER, login);
+  lsSet(KEYS.ADMIN_PASS, pass);
+  document.getElementById('newAdminLogin').value = '';
+  document.getElementById('newAdminPass').value = '';
+  document.getElementById('newAdminPassConfirm').value = '';
+  showTmpMsg('credsSavedMsg');
+};
+
+function showTmpMsg(id) {
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 2500);
+}
+
+// ══════════════════════════════════════════════
+// MAIN APP
+// ══════════════════════════════════════════════
+let selectedLang = 'uk';
+let appHistory = [];
+
+function renderAppModels() {
+  const sel = document.getElementById('modelSelect');
+  const models = getModels().filter(m => m.enabled);
+  sel.innerHTML = '';
+  models.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    opt.textContent = m.label || m.id;
+    sel.appendChild(opt);
+  });
+}
+
 document.querySelectorAll('.lang-btn').forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
@@ -501,7 +934,6 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
   };
 });
 
-// ── CHAR COUNT ──
 const textInput = document.getElementById('text-input');
 textInput.addEventListener('input', () => {
   const len = textInput.value.length;
@@ -509,16 +941,20 @@ textInput.addEventListener('input', () => {
   if (len > 800) textInput.value = textInput.value.slice(0, 800);
 });
 
-// ── FIX ──
 document.getElementById('fixBtn').onclick = fixText;
-textInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && e.ctrlKey) fixText();
-});
+textInput.addEventListener('keydown', e => { if (e.key === 'Enter' && e.ctrlKey) fixText(); });
 
 async function fixText() {
   const text = textInput.value.trim();
   if (!text) {
     textInput.animate([{borderColor:'rgba(251,113,133,0.5)'},{borderColor:''}], {duration:400});
+    return;
+  }
+
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    document.getElementById('errorBox').textContent = '⚠️ API ключ не налаштовано. Зверніться до адміністратора.';
+    document.getElementById('errorBox').style.display = 'block';
     return;
   }
 
@@ -568,11 +1004,7 @@ async function fixText() {
       }
     );
     const data = await res.json();
-
-    if (data.error) {
-      showError(data.error);
-      return;
-    }
+    if (data.error) { showError(data.error); return; }
 
     let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     raw = raw.replace(/```json|```/g, '').trim();
@@ -580,7 +1012,6 @@ async function fixText() {
     let parsed;
     try { parsed = JSON.parse(raw); }
     catch(e) {
-      // fallback: extract JSON from response
       const match = raw.match(/\{[\s\S]*\}/);
       if (match) parsed = JSON.parse(match[0]);
       else throw new Error('Не вдалося розпізнати відповідь AI');
@@ -603,13 +1034,9 @@ function showError(err) {
   const isQuota = err.message?.toLowerCase().includes('quota');
   const retry = err.message?.match(/retry in ([\d.]+)s/i);
   const sec = retry ? Math.ceil(parseFloat(retry[1])) : null;
-  if (isQuota) {
-    box.innerHTML = `⚠️ Ліміт вичерпано${sec ? ` — спробуй через ${sec}с` : ''}. Обери іншу модель.`;
-  } else if (err.code === 400 || err.code === 403) {
-    box.textContent = '🔑 Невірний API ключ. Перезавантаж сторінку.';
-  } else {
-    box.textContent = `⚠️ ${err.message}`;
-  }
+  if (isQuota) box.innerHTML = `⚠️ Ліміт вичерпано${sec ? ` — спробуй через ${sec}с` : ''}. Обери іншу модель.`;
+  else if (err.code === 400 || err.code === 403) box.textContent = '🔑 Невірний API ключ. Зверніться до адміністратора.';
+  else box.textContent = `⚠️ ${err.message}`;
   box.style.display = 'block';
 }
 
@@ -618,10 +1045,8 @@ function showResult(data, original) {
   const resultText = document.getElementById('result-text');
   const changesList = document.getElementById('changes-list');
   const badge = document.getElementById('changes-badge');
-
   resultText.textContent = data.corrected;
   changesList.innerHTML = '';
-
   if (data.noChanges || data.changes.length === 0) {
     badge.textContent = '0';
     changesList.innerHTML = `<div class="no-changes">✅ Текст вже правильний! Помилок не знайдено.</div>`;
@@ -640,7 +1065,6 @@ function showResult(data, original) {
       changesList.appendChild(item);
     });
   }
-
   card.style.display = 'block';
   card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -649,24 +1073,19 @@ function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// Action buttons
 document.getElementById('copyBtn').onclick = async () => {
   const text = document.getElementById('result-text').textContent;
   if (!text) return;
   try {
     await navigator.clipboard.writeText(text);
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✅ Скопійовано!';
-    btn.classList.add('success');
-    setTimeout(() => { btn.textContent = '📋 Копіювати'; btn.classList.remove('success'); }, 2000);
   } catch(e) {
     const ta = document.createElement('textarea');
     ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
     document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✅ Скопійовано!'; btn.classList.add('success');
-    setTimeout(() => { btn.textContent = '📋 Копіювати'; btn.classList.remove('success'); }, 2000);
   }
+  const btn = document.getElementById('copyBtn');
+  btn.textContent = '✅ Скопійовано!'; btn.classList.add('success');
+  setTimeout(() => { btn.textContent = '📋 Копіювати'; btn.classList.remove('success'); }, 2000);
 };
 
 document.getElementById('useBtn').onclick = () => {
@@ -687,21 +1106,20 @@ document.getElementById('clearBtn').onclick = () => {
   textInput.focus();
 };
 
-// ── HISTORY ──
 function saveToHistory(original, corrected) {
   if (original === corrected) return;
-  history.unshift({ original, corrected, time: new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'}) });
-  if (history.length > 10) history.pop();
+  appHistory.unshift({ original, corrected, time: new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'}) });
+  if (appHistory.length > 10) appHistory.pop();
   renderHistory();
 }
 
 function renderHistory() {
   const sec = document.getElementById('historySection');
   const list = document.getElementById('historyList');
-  if (history.length === 0) { sec.style.display = 'none'; return; }
+  if (appHistory.length === 0) { sec.style.display = 'none'; return; }
   sec.style.display = 'block';
   list.innerHTML = '';
-  history.forEach((item, i) => {
+  appHistory.forEach(item => {
     const el = document.createElement('div');
     el.className = 'hist-item';
     el.innerHTML = `
@@ -718,9 +1136,14 @@ function renderHistory() {
 }
 
 document.getElementById('historyClearBtn').onclick = () => {
-  history = [];
+  appHistory = [];
   renderHistory();
 };
+
+// ══════════════════════════════════════════════
+// START
+// ══════════════════════════════════════════════
+route();
 </script>
 </body>
 </html>
