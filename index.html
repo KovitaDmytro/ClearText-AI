@@ -527,7 +527,7 @@ body {
         </div>
       </div>
       <div class="admin-section-body">
-        <div class="info-box">Цей ключ використовується всіма користувачами. Не передавайте нікому доступ до цієї панелі.</div>
+        <div class="info-box">Ключ збережений тут діє лише на цьому пристрої. Щоб сервіс працював на всіх пристроях — впишіть ключ напряму у файл <b style="color:var(--blue);font-family:'JetBrains Mono',monospace">HARDCODED_API_KEY</b> у коді.</div>
         <div class="admin-row">
           <div class="admin-key-wrap">
             <input type="password" class="admin-key-input" id="adminApiKeyInput" placeholder="AIzaSy...">
@@ -643,47 +643,83 @@ body {
   </div>
 </div>
 
-<script>
+<script type="module">
 // ══════════════════════════════════════════════
-// STORAGE KEYS
+// FIREBASE INIT
+// ══════════════════════════════════════════════
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAdhdpQno2Pe0lBoS1DlZySJeRzso_WlZE",
+  authDomain: "cleartext-ai-a34a6.firebaseapp.com",
+  databaseURL: "https://cleartext-ai-a34a6-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "cleartext-ai-a34a6",
+  storageBucket: "cleartext-ai-a34a6.firebasestorage.app",
+  messagingSenderId: "897219922207",
+  appId: "1:897219922207:web:4d449dbfdfef501a0c082a"
+};
+
+const fireApp = initializeApp(firebaseConfig);
+const db = getFirestore(fireApp);
+
+// ══════════════════════════════════════════════
+// FIRESTORE HELPERS — зберігають спільні дані
+// ══════════════════════════════════════════════
+async function fsGet(docId) {
+  try {
+    const snap = await getDoc(doc(db, 'config', docId));
+    return snap.exists() ? snap.data() : null;
+  } catch(e) { return null; }
+}
+
+async function fsSet(docId, data) {
+  try {
+    await setDoc(doc(db, 'config', docId), data, { merge: true });
+    return true;
+  } catch(e) { return false; }
+}
+
+// ══════════════════════════════════════════════
+// LOCAL STORAGE HELPERS — тільки для сесії адміна
 // ══════════════════════════════════════════════
 const KEYS = {
-  API_KEY:    'ct_api_key',
-  MODELS:     'ct_models',
   ADMIN_USER: 'ct_admin_user',
   ADMIN_PASS: 'ct_admin_pass',
   ADMIN_SES:  'ct_admin_session',
 };
 
-// Default admin credentials (first run)
 const DEFAULT_ADMIN = { user: 'admin', pass: 'admin123' };
 
-// Default models
 const DEFAULT_MODELS = [
-  { id: 'gemini-2.5-flash',        label: '2.5 Flash',      enabled: true  },
-  { id: 'gemini-2.0-flash',        label: '2.0 Flash',      enabled: true  },
-  { id: 'gemini-1.5-flash',        label: '1.5 Flash',      enabled: true  },
-  { id: 'gemini-2.5-pro',          label: '2.5 Pro',        enabled: false },
+  { id: 'gemini-2.5-flash', label: '2.5 Flash', enabled: true  },
+  { id: 'gemini-2.0-flash', label: '2.0 Flash', enabled: true  },
+  { id: 'gemini-1.5-flash', label: '1.5 Flash', enabled: true  },
+  { id: 'gemini-2.5-pro',   label: '2.5 Pro',   enabled: false },
 ];
 
-// ══════════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════════
 function lsGet(key, fallback = null) {
   try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : fallback; }
   catch { return fallback; }
 }
 function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
 
-function getApiKey()  { return lsGet(KEYS.API_KEY, ''); }
-function getModels()  { return lsGet(KEYS.MODELS, DEFAULT_MODELS); }
+// Кеш щоб не робити зайвих запитів до Firestore
+let _cachedSettings = null;
+
+async function getSettings() {
+  if (_cachedSettings) return _cachedSettings;
+  const data = await fsGet('settings');
+  _cachedSettings = data || { apiKey: '', models: DEFAULT_MODELS };
+  return _cachedSettings;
+}
+
+function invalidateCache() { _cachedSettings = null; }
+
 function getAdminUser(){ return lsGet(KEYS.ADMIN_USER, DEFAULT_ADMIN.user); }
 function getAdminPass(){ return lsGet(KEYS.ADMIN_PASS, DEFAULT_ADMIN.pass); }
 
-function isAdminSession() {
-  const token = sessionStorage.getItem(KEYS.ADMIN_SES);
-  return token === 'ok';
-}
+function isAdminSession() { return sessionStorage.getItem(KEYS.ADMIN_SES) === 'ok'; }
 function setAdminSession(v) {
   if (v) sessionStorage.setItem(KEYS.ADMIN_SES, 'ok');
   else sessionStorage.removeItem(KEYS.ADMIN_SES);
@@ -696,42 +732,32 @@ function show(id, flex) {
 function hide(id) { document.getElementById(id).style.display = 'none'; }
 
 // ══════════════════════════════════════════════
-// ROUTING — check URL on load
+// ROUTING
 // ══════════════════════════════════════════════
-function route() {
+async function route() {
   const url = window.location.href;
-  const search = window.location.search;
-  const hash = window.location.hash;
-  const pathname = window.location.pathname;
-
-  // Works with:
-  //   http://site.com/?admin
-  //   http://site.com/index.html?admin
-  //   file:///C:/index.html#admin   (file:// fallback via hash)
-  //   #admin hash navigation
-  const goAdmin =
-    search.includes('admin') ||
-    hash === '#admin' ||
-    pathname.includes('?admin') ||
-    url.includes('%3Fadmin');
+  const goAdmin = window.location.search.includes('admin') ||
+                  window.location.hash === '#admin' ||
+                  url.includes('%3Fadmin');
 
   if (goAdmin) {
     if (isAdminSession()) {
-      showAdmin();
+      await showAdmin();
     } else {
       showAdminLogin();
     }
   } else {
-    const key = getApiKey();
-    if (!key) {
-      show('no-api-screen', true);
+    // Показуємо лоадер поки перевіряємо ключ
+    show('no-api-screen', true);
+    const settings = await getSettings();
+    if (settings.apiKey) {
+      showApp(settings);
     } else {
-      showApp();
+      // Залишаємо no-api-screen
     }
   }
 }
 
-// Also handle hash changes (e.g. clicking #admin link)
 window.addEventListener('hashchange', route);
 
 // ══════════════════════════════════════════════
@@ -744,20 +770,20 @@ function showAdminLogin() {
   show('admin-login-screen', true);
 }
 
-function showAdmin() {
+async function showAdmin() {
   hide('no-api-screen');
   hide('admin-login-screen');
   hide('app-screen');
   show('admin-screen', true);
-  renderAdmin();
+  await renderAdmin();
 }
 
-function showApp() {
+function showApp(settings) {
   hide('no-api-screen');
   hide('admin-login-screen');
   hide('admin-screen');
   show('app-screen', true);
-  renderAppModels();
+  renderAppModels(settings.models || DEFAULT_MODELS);
   document.getElementById('text-input').focus();
 }
 
@@ -766,17 +792,18 @@ function showApp() {
 // ══════════════════════════════════════════════
 document.getElementById('adminPassToggle').onclick = () => {
   const inp = document.getElementById('adminPassInput');
-  const show = inp.type === 'password';
-  inp.type = show ? 'text' : 'password';
-  document.getElementById('adminPassToggle').textContent = show ? '🙈' : '👁';
+  const s = inp.type === 'password';
+  inp.type = s ? 'text' : 'password';
+  document.getElementById('adminPassToggle').textContent = s ? '🙈' : '👁';
 };
 
 document.getElementById('adminLoginBtn').onclick = doAdminLogin;
-document.getElementById('adminPassInput').addEventListener('keydown', e => { if(e.key === 'Enter') doAdminLogin(); });
-document.getElementById('adminLoginInput').addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('adminPassInput').focus(); });
+document.getElementById('adminPassInput').addEventListener('keydown', e => { if(e.key==='Enter') doAdminLogin(); });
+document.getElementById('adminLoginInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('adminPassInput').focus(); });
 
 document.getElementById('adminBackLink').onclick = () => {
-  const base = window.location.href.split('?')[0].split('#')[0]; window.location.replace(base);
+  const base = window.location.href.split('?')[0].split('#')[0];
+  window.location.replace(base);
 };
 
 function doAdminLogin() {
@@ -791,7 +818,7 @@ function doAdminLogin() {
   } else {
     errBox.style.display = 'block';
     const card = document.querySelector('.admin-login-card');
-    card.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(0)'}], {duration:300});
+    card.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(0)'}],{duration:300});
     document.getElementById('adminPassInput').value = '';
     document.getElementById('adminPassInput').focus();
   }
@@ -802,27 +829,27 @@ function doAdminLogin() {
 // ══════════════════════════════════════════════
 document.getElementById('adminLogoutBtn').onclick = () => {
   setAdminSession(false);
-  const base = window.location.href.split('?')[0].split('#')[0]; window.location.replace(base);
+  const base = window.location.href.split('?')[0].split('#')[0];
+  window.location.replace(base);
 };
 
 // ══════════════════════════════════════════════
-// ADMIN PANEL RENDER
+// ADMIN PANEL
 // ══════════════════════════════════════════════
-function renderAdmin() {
+async function renderAdmin() {
+  const settings = await getSettings();
+
   // API key
-  const key = getApiKey();
   const inp = document.getElementById('adminApiKeyInput');
-  inp.value = key || '';
+  inp.value = settings.apiKey || '';
   const dot = document.getElementById('apiStatusDot');
   dot.style.display = 'inline-block';
-  dot.className = 'status-dot' + (key ? '' : ' off');
+  dot.className = 'status-dot' + (settings.apiKey ? '' : ' off');
 
-  // Models
-  renderAdminModels();
+  renderAdminModels(settings.models || DEFAULT_MODELS);
 }
 
-function renderAdminModels() {
-  const models = getModels();
+function renderAdminModels(models) {
   const list = document.getElementById('modelsList');
   list.innerHTML = '';
   models.forEach((m, i) => {
@@ -842,56 +869,85 @@ function renderAdminModels() {
   });
 
   list.querySelectorAll('.model-toggle input').forEach(cb => {
-    cb.addEventListener('change', () => {
-      const models = getModels();
-      models[+cb.dataset.idx].enabled = cb.checked;
-      lsSet(KEYS.MODELS, models);
+    cb.addEventListener('change', async () => {
+      const settings = await getSettings();
+      const mods = settings.models || DEFAULT_MODELS;
+      mods[+cb.dataset.idx].enabled = cb.checked;
+      await fsSet('settings', { models: mods });
+      invalidateCache();
       showTmpMsg('modelsSavedMsg');
     });
   });
+
   list.querySelectorAll('.btn-del-model').forEach(btn => {
-    btn.onclick = () => {
-      const models = getModels();
-      models.splice(+btn.dataset.idx, 1);
-      lsSet(KEYS.MODELS, models);
-      renderAdminModels();
+    btn.onclick = async () => {
+      const settings = await getSettings();
+      const mods = settings.models || DEFAULT_MODELS;
+      mods.splice(+btn.dataset.idx, 1);
+      await fsSet('settings', { models: mods });
+      invalidateCache();
+      const s2 = await getSettings();
+      renderAdminModels(s2.models || DEFAULT_MODELS);
       showTmpMsg('modelsSavedMsg');
     };
   });
 }
 
-// Save API key
+// Toggle API key visibility
 document.getElementById('adminApiKeyToggle').onclick = () => {
   const inp = document.getElementById('adminApiKeyInput');
-  const show = inp.type === 'password';
-  inp.type = show ? 'text' : 'password';
-  document.getElementById('adminApiKeyToggle').textContent = show ? '🙈' : '👁';
+  const s = inp.type === 'password';
+  inp.type = s ? 'text' : 'password';
+  document.getElementById('adminApiKeyToggle').textContent = s ? '🙈' : '👁';
 };
 
-document.getElementById('saveApiKeyBtn').onclick = () => {
+// Save API key → Firestore
+document.getElementById('saveApiKeyBtn').onclick = async () => {
   const val = document.getElementById('adminApiKeyInput').value.trim();
-  lsSet(KEYS.API_KEY, val);
+  const btn = document.getElementById('saveApiKeyBtn');
+  btn.textContent = '⏳ Збереження...';
+  btn.disabled = true;
+
+  const ok = await fsSet('settings', { apiKey: val });
+  invalidateCache();
+
   const dot = document.getElementById('apiStatusDot');
   dot.className = 'status-dot' + (val ? '' : ' off');
-  showTmpMsg('apiKeySavedMsg');
+  btn.textContent = '💾 Зберегти';
+  btn.disabled = false;
+
+  if (ok) showTmpMsg('apiKeySavedMsg');
+  else {
+    document.getElementById('apiKeySavedMsg').textContent = '❌ Помилка збереження. Перевір правила Firestore.';
+    document.getElementById('apiKeySavedMsg').style.color = 'var(--rose)';
+    document.getElementById('apiKeySavedMsg').style.display = 'block';
+    setTimeout(() => {
+      document.getElementById('apiKeySavedMsg').style.display = 'none';
+      document.getElementById('apiKeySavedMsg').style.color = '';
+      document.getElementById('apiKeySavedMsg').textContent = '✅ API ключ збережено!';
+    }, 3000);
+  }
 };
 
-// Add model
-document.getElementById('addModelBtn').onclick = () => {
+// Add model → Firestore
+document.getElementById('addModelBtn').onclick = async () => {
   const inp = document.getElementById('newModelInput');
   const val = inp.value.trim();
   if (!val) return;
-  const models = getModels();
-  if (models.find(m => m.id === val)) { inp.value = ''; return; }
-  models.push({ id: val, label: '', enabled: true });
-  lsSet(KEYS.MODELS, models);
-  renderAdminModels();
+
+  const settings = await getSettings();
+  const mods = settings.models || DEFAULT_MODELS;
+  if (mods.find(m => m.id === val)) { inp.value = ''; return; }
+  mods.push({ id: val, label: '', enabled: true });
+  await fsSet('settings', { models: mods });
+  invalidateCache();
+  renderAdminModels(mods);
   inp.value = '';
   showTmpMsg('modelsSavedMsg');
 };
-document.getElementById('newModelInput').addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('addModelBtn').click(); });
+document.getElementById('newModelInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('addModelBtn').click(); });
 
-// Save credentials
+// Save admin credentials → localStorage (тільки на пристрої адміна)
 document.getElementById('saveCredsBtn').onclick = () => {
   const login = document.getElementById('newAdminLogin').value.trim();
   const pass  = document.getElementById('newAdminPass').value;
@@ -923,11 +979,10 @@ function showTmpMsg(id) {
 let selectedLang = 'uk';
 let appHistory = [];
 
-function renderAppModels() {
+function renderAppModels(models) {
   const sel = document.getElementById('modelSelect');
-  const models = getModels().filter(m => m.enabled);
   sel.innerHTML = '';
-  models.forEach(m => {
+  models.filter(m => m.enabled).forEach(m => {
     const opt = document.createElement('option');
     opt.value = m.id;
     opt.textContent = m.label || m.id;
@@ -951,16 +1006,17 @@ textInput.addEventListener('input', () => {
 });
 
 document.getElementById('fixBtn').onclick = fixText;
-textInput.addEventListener('keydown', e => { if (e.key === 'Enter' && e.ctrlKey) fixText(); });
+textInput.addEventListener('keydown', e => { if (e.key==='Enter' && e.ctrlKey) fixText(); });
 
 async function fixText() {
   const text = textInput.value.trim();
   if (!text) {
-    textInput.animate([{borderColor:'rgba(251,113,133,0.5)'},{borderColor:''}], {duration:400});
+    textInput.animate([{borderColor:'rgba(251,113,133,0.5)'},{borderColor:''}],{duration:400});
     return;
   }
 
-  const apiKey = getApiKey();
+  const settings = await getSettings();
+  const apiKey = settings.apiKey;
   if (!apiKey) {
     document.getElementById('errorBox').textContent = '⚠️ API ключ не налаштовано. Зверніться до адміністратора.';
     document.getElementById('errorBox').style.display = 'block';
@@ -1026,7 +1082,7 @@ async function fixText() {
       else throw new Error('Не вдалося розпізнати відповідь AI');
     }
 
-    showResult(parsed, text);
+    showResult(parsed);
     saveToHistory(text, parsed.corrected);
 
   } catch(err) {
@@ -1049,7 +1105,7 @@ function showError(err) {
   box.style.display = 'block';
 }
 
-function showResult(data, original) {
+function showResult(data) {
   const card = document.getElementById('result-card');
   const resultText = document.getElementById('result-text');
   const changesList = document.getElementById('changes-list');
@@ -1085,9 +1141,8 @@ function escHtml(s) {
 document.getElementById('copyBtn').onclick = async () => {
   const text = document.getElementById('result-text').textContent;
   if (!text) return;
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch(e) {
+  try { await navigator.clipboard.writeText(text); }
+  catch(e) {
     const ta = document.createElement('textarea');
     ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
     document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
@@ -1150,24 +1205,15 @@ document.getElementById('historyClearBtn').onclick = () => {
 };
 
 // ══════════════════════════════════════════════
-// SMART ADMIN LINK — works for file:// and http://
+// SMART ADMIN LINK
 // ══════════════════════════════════════════════
 function getAdminUrl() {
-  const isFile = window.location.protocol === 'file:';
-  if (isFile) {
-    // file:// doesn't support query strings properly, use hash
-    return window.location.href.split('?')[0].split('#')[0] + '#admin';
-  }
   const base = window.location.href.split('?')[0].split('#')[0];
-  return base + '?admin';
+  return window.location.protocol === 'file:' ? base + '#admin' : base + '?admin';
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const link = document.getElementById('goAdminLink');
-  if (link) {
-    link.onclick = () => { window.location.href = getAdminUrl(); };
-  }
-});
+const _link = document.getElementById('goAdminLink');
+if (_link) _link.onclick = () => { window.location.href = getAdminUrl(); };
 
 // ══════════════════════════════════════════════
 // START
