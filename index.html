@@ -669,16 +669,23 @@ const db = getFirestore(fireApp);
 // FIRESTORE HELPERS — зберігають спільні дані
 // ══════════════════════════════════════════════
 async function fsGet(docId) {
-  // Заглушка: миттєво повертаємо успішний статус і ваш ключ, оминаючи сервер
-  if (docId === 'settings') {
-    return { apiKey: "AIzaSyAdhdpQno2Pe0lBoS1DlZySJeRzso_WlZE" }; // Впишіть сюди ваш реальний Gemini ключ
+  try {
+    const snap = await getDoc(doc(db, 'app', docId));
+    return snap.exists() ? snap.data() : null;
+  } catch(e) {
+    console.warn('fsGet error:', e);
+    return null;
   }
-  return {}; 
 }
 
 async function fsSet(docId, data) {
-  // Заглушка: робимо вигляд, що успішно зберегли в базу даних, щоб кнопка відвисла
-  return true; 
+  try {
+    await setDoc(doc(db, 'app', docId), data, { merge: true });
+    return true;
+  } catch(e) {
+    console.warn('fsSet error:', e);
+    return false;
+  }
 }
 
 // ══════════════════════════════════════════════
