@@ -1016,7 +1016,8 @@ async function fixText() {
     return;
   }
 
-  const apiKey = "AIzaSyC2VJ1pcn_M5oaJPhY8KirSkf1pIjlDoVs";
+  const settings = await getSettings();
+  const apiKey = settings.apiKey;
   if (!apiKey) {
     document.getElementById('errorBox').textContent = '⚠️ API ключ не налаштовано. Зверніться до адміністратора.';
     document.getElementById('errorBox').style.display = 'block';
