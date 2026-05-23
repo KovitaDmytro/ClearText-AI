@@ -603,12 +603,7 @@ body {
         <div class="char-count" id="charCount">0 / 800</div>
       </div>
       <textarea id="text-input" placeholder="Напишіть речення яке хочете виправити…&#10;Наприклад: «я вчора ходив магазін купляв хліб і молоко»"></textarea>
-      <div class="lang-row">
-        <span class="lang-label">Мова:</span>
-        <button class="lang-btn active" data-lang="uk" type="button">🇺🇦 Українська</button>
-        <button class="lang-btn" data-lang="ru" type="button">🇷🇺 Російська</button>
-        <button class="lang-btn" data-lang="auto" type="button">🔍 Авто</button>
-      </div>
+
     </div>
 
     <button class="btn-fix" id="fixBtn" type="button">
@@ -1037,8 +1032,7 @@ async function fixText() {
   document.getElementById('result-card').style.display = 'none';
   document.getElementById('errorBox').style.display = 'none';
 
-  const langMap = { uk: 'українською мовою', ru: 'русским языком', auto: 'визначивши мову автоматично' };
-  const langNote = langMap[selectedLang] || 'українською мовою';
+  const langNote = 'українською мовою';
 
   const prompt = `Ти — асистент з виправлення тексту для людей з вадами слуху, які пишуть неграмотно.
 
