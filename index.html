@@ -474,12 +474,12 @@ body {
 <!-- ── NO API SCREEN ── -->
 <div id="no-api-screen">
   <div class="no-api-card">
-    <div class="no-api-icon">⚙️</div>
-    <div class="no-api-title">Сервіс не налаштовано</div>
+    <div class="no-api-icon">🤖</div>
+    <div class="no-api-title" style="color:var(--text)">ClearText AI</div>
     <div class="no-api-text">
-      Адміністратор ще не додав API ключ.<br>
-      Зверніться до адміністратора або перейдіть на<br>
-      <a href="/?admin" style="color:var(--blue);text-decoration:none;font-weight:700">сторінку налаштувань</a>.
+      Вибачте, на разі сервіс не працює.<br>
+      Спробуйте будь ласка пізніше.
+      <a id="goAdminLink" style="display:none"></a>
     </div>
   </div>
 </div>
@@ -699,23 +699,29 @@ function hide(id) { document.getElementById(id).style.display = 'none'; }
 // ROUTING — check URL on load
 // ══════════════════════════════════════════════
 function route() {
-  const isAdmin = window.location.search === '?admin' || window.location.pathname.endsWith('?admin');
-  const params = new URLSearchParams(window.location.search);
-  const adminRoute = params.has('admin') || window.location.hash === '#admin';
-
-  // Simpler: just check if "?admin" is anywhere in the URL
   const url = window.location.href;
-  const goAdmin = url.includes('?admin') || url.includes('/?admin');
+  const search = window.location.search;
+  const hash = window.location.hash;
+  const pathname = window.location.pathname;
+
+  // Works with:
+  //   http://site.com/?admin
+  //   http://site.com/index.html?admin
+  //   file:///C:/index.html#admin   (file:// fallback via hash)
+  //   #admin hash navigation
+  const goAdmin =
+    search.includes('admin') ||
+    hash === '#admin' ||
+    pathname.includes('?admin') ||
+    url.includes('%3Fadmin');
 
   if (goAdmin) {
-    // Admin route
     if (isAdminSession()) {
       showAdmin();
     } else {
       showAdminLogin();
     }
   } else {
-    // Main app route
     const key = getApiKey();
     if (!key) {
       show('no-api-screen', true);
@@ -724,6 +730,9 @@ function route() {
     }
   }
 }
+
+// Also handle hash changes (e.g. clicking #admin link)
+window.addEventListener('hashchange', route);
 
 // ══════════════════════════════════════════════
 // SCREENS
@@ -767,7 +776,7 @@ document.getElementById('adminPassInput').addEventListener('keydown', e => { if(
 document.getElementById('adminLoginInput').addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('adminPassInput').focus(); });
 
 document.getElementById('adminBackLink').onclick = () => {
-  window.location.href = window.location.pathname;
+  const base = window.location.href.split('?')[0].split('#')[0]; window.location.replace(base);
 };
 
 function doAdminLogin() {
@@ -793,7 +802,7 @@ function doAdminLogin() {
 // ══════════════════════════════════════════════
 document.getElementById('adminLogoutBtn').onclick = () => {
   setAdminSession(false);
-  window.location.href = window.location.pathname;
+  const base = window.location.href.split('?')[0].split('#')[0]; window.location.replace(base);
 };
 
 // ══════════════════════════════════════════════
@@ -1139,6 +1148,26 @@ document.getElementById('historyClearBtn').onclick = () => {
   appHistory = [];
   renderHistory();
 };
+
+// ══════════════════════════════════════════════
+// SMART ADMIN LINK — works for file:// and http://
+// ══════════════════════════════════════════════
+function getAdminUrl() {
+  const isFile = window.location.protocol === 'file:';
+  if (isFile) {
+    // file:// doesn't support query strings properly, use hash
+    return window.location.href.split('?')[0].split('#')[0] + '#admin';
+  }
+  const base = window.location.href.split('?')[0].split('#')[0];
+  return base + '?admin';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const link = document.getElementById('goAdminLink');
+  if (link) {
+    link.onclick = () => { window.location.href = getAdminUrl(); };
+  }
+});
 
 // ══════════════════════════════════════════════
 // START
