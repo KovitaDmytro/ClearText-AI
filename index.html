@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#080b14">
+<title>ClearText AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #080b14;
+  --surface: rgba(255,255,255,0.055);
+  --surface2: rgba(255,255,255,0.09);
+  --border: rgba(255,255,255,0.1);
+  --border2: rgba(255,255,255,0.16);
+  --blur: blur(36px) saturate(180%);
+  --blur-sm: blur(16px) saturate(160%);
+  --green: #34d399;
+  --green-glow: rgba(52,211,153,0.25);
+  --blue: #60a5fa;
+  --blue-glow: rgba(96,165,250,0.25);
+  --amber: #fbbf24;
+  --rose: #fb7185;
+  --text: rgba(255,255,255,0.92);
+  --muted: rgba(255,255,255,0.5);
+  --dim: rgba(255,255,255,0.25);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html, body { height: 100%; height: 100dvh; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+/* BG */
+.bg-mesh { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.bg-orb { position: absolute; border-radius: 50%; filter: blur(90px); }
+.bg-orb:nth-child(1) { width: 60vw; height: 60vw; background: radial-gradient(circle, #065f46, transparent 70%); top: -15%; left: -15%; opacity: 0.6; animation: o1 22s ease-in-out infinite alternate; }
+.bg-orb:nth-child(2) { width: 50vw; height: 50vw; background: radial-gradient(circle, #1e40af, transparent 70%); bottom: -10%; right: -10%; opacity: 0.5; animation: o2 18s ease-in-out infinite alternate; }
+.bg-orb:nth-child(3) { width: 40vw; height: 40vw; background: radial-gradient(circle, #6b21a8, transparent 70%); top: 40%; left: 35%; opacity: 0.35; animation: o1 14s ease-in-out infinite alternate-reverse; }
+@keyframes o1 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(5vw,-4vh) scale(1.08)} }
+@keyframes o2 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(-4vw,5vh) scale(0.92)} }
+
+/* ── SETUP SCREEN ── */
+#setup-screen {
+  position: relative; z-index: 10;
+  min-height: 100dvh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: calc(var(--safe-top) + 24px) 20px calc(var(--safe-bottom) + 24px);
+}
+
+.setup-card {
+  width: 100%; max-width: 440px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border2);
+  border-radius: 26px;
+  padding: 40px 32px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.18);
+  animation: cardIn 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(28px) scale(0.96); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+.app-icon {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, rgba(52,211,153,0.3), rgba(96,165,250,0.25));
+  border: 1px solid rgba(52,211,153,0.35);
+  border-radius: 22px;
+  margin: 0 auto 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px;
+  box-shadow: 0 8px 32px rgba(52,211,153,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+  animation: iconFloat 4s ease-in-out infinite;
+}
+@keyframes iconFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+.setup-title {
+  font-size: 26px; font-weight: 900; text-align: center; letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff 30%, var(--green));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 8px;
+}
+.setup-sub {
+  font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; margin-bottom: 10px;
+}
+.setup-sub a { color: var(--green); text-decoration: none; }
+
+/* Feature chips */
+.features {
+  display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 14px 0 24px;
+}
+.chip {
+  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 11px;
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.field-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 7px; display: block; }
+
+.key-wrap { position: relative; margin-bottom: 14px; }
+.key-input {
+  width: 100%;
+  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+  border-radius: 14px; padding: 13px 46px 13px 16px;
+  color: var(--text); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600;
+  outline: none; transition: all 0.2s;
+  backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
+  -webkit-appearance: none;
+}
+.key-input::placeholder { color: var(--dim); }
+.key-input:focus { border-color: rgba(52,211,153,0.5); box-shadow: 0 0 0 3px rgba(52,211,153,0.12); background: rgba(255,255,255,0.1); }
+
+.key-toggle { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 17px; color: var(--muted); transition: color 0.2s; }
+.key-toggle:hover { color: var(--green); }
+
+.btn-enter {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, rgba(52,211,153,0.55), rgba(16,185,129,0.65));
+  border: 1px solid rgba(52,211,153,0.4); border-radius: 14px;
+  color: #fff; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900;
+  cursor: pointer; letter-spacing: 0.04em;
+  box-shadow: 0 4px 28px rgba(52,211,153,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all 0.2s; -webkit-appearance: none;
+}
+.btn-enter:hover { transform: translateY(-1px); box-shadow: 0 8px 36px rgba(52,211,153,0.4), inset 0 1px 0 rgba(255,255,255,0.2); }
+.btn-enter:active { transform: scale(0.98); }
+.setup-note { font-size: 11px; color: var(--dim); text-align: center; margin-top: 14px; line-height: 1.6; }
+
+/* ── MAIN APP ── */
+#app-screen {
+  display: none;
+  position: relative; z-index: 10;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+
+/* Header */
+.app-header {
+  position: sticky; top: 0; z-index: 50;
+  padding: calc(var(--safe-top) + 12px) 20px 12px;
+  background: rgba(8,11,20,0.6);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.app-header-icon { font-size: 22px; }
+.app-header-info { flex: 1; }
+.app-header-title { font-size: 17px; font-weight: 900; letter-spacing: -0.02em; background: linear-gradient(90deg,#fff,var(--green)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.app-header-sub { font-size: 10px; font-weight: 700; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; }
+
+.model-sel {
+  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--muted);
+  font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700;
+  padding: 5px 9px; outline: none; cursor: pointer; max-width: 150px;
+  -webkit-appearance: none; backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
+}
+.model-sel option { background: #0f172a; }
+
+/* Main content */
+.app-body {
+  flex: 1; padding: 20px 16px calc(var(--safe-bottom) + 24px);
+  display: flex; flex-direction: column; gap: 16px;
+}
+@media(min-width:640px) { .app-body { max-width: 720px; margin: 0 auto; width: 100%; padding: 28px 24px calc(var(--safe-bottom) + 28px); } }
+
+/* Input card */
+.card {
+  background: rgba(255,255,255,0.055);
+  backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border); border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 14px 18px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.card-title { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 7px; }
+.card-title span { font-size: 14px; }
+
+.char-count { font-size: 11px; font-weight: 700; color: var(--dim); font-family: 'JetBrains Mono', monospace; }
+
+#text-input {
+  width: 100%; background: none; border: none; outline: none; resize: none;
+  color: var(--text); font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 600;
+  line-height: 1.7; padding: 14px 18px 18px; min-height: 130px; max-height: 260px;
+  overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  -webkit-appearance: none;
+}
+#text-input::-webkit-scrollbar { width: 3px; }
+#text-input::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+#text-input::placeholder { color: var(--dim); font-weight: 500; }
+
+/* Language row */
+.lang-row {
+  padding: 10px 18px 14px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.lang-label { font-size: 11px; font-weight: 700; color: var(--dim); margin-right: 2px; }
+.lang-btn {
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 12px;
+  font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted);
+  cursor: pointer; transition: all 0.2s; -webkit-appearance: none;
+}
+.lang-btn.active {
+  background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.4); color: var(--green);
+}
+.lang-btn:hover { background: rgba(255,255,255,0.1); }
+
+/* Fix button */
+.btn-fix {
+  width: 100%; padding: 16px;
+  background: linear-gradient(135deg, rgba(52,211,153,0.5), rgba(96,165,250,0.45));
+  border: 1px solid rgba(52,211,153,0.35); border-radius: 16px;
+  color: #fff; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900;
+  cursor: pointer; letter-spacing: 0.03em;
+  box-shadow: 0 4px 28px rgba(52,211,153,0.2), inset 0 1px 0 rgba(255,255,255,0.18);
+  transition: all 0.2s; -webkit-appearance: none; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-fix::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent); opacity: 0; transition: opacity 0.2s; }
+.btn-fix:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 36px rgba(52,211,153,0.35), inset 0 1px 0 rgba(255,255,255,0.18); }
+.btn-fix:hover:not(:disabled)::before { opacity: 1; }
+.btn-fix:active:not(:disabled) { transform: scale(0.98); }
+.btn-fix:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-fix .spinner {
+  width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+  border-radius: 50%; animation: spin 0.7s linear infinite; display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn-fix.loading .btn-label { display: none; }
+.btn-fix.loading .spinner { display: block; }
+
+/* Result card */
+#result-card { display: none; animation: fadeUp 0.4s cubic-bezier(0.34,1.2,0.64,1) forwards; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+/* Corrected text */
+.result-text {
+  padding: 16px 18px;
+  font-size: 15px; font-weight: 600; line-height: 1.75;
+  color: var(--text);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Changes list */
+.changes-header {
+  padding: 12px 18px 8px;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted);
+  display: flex; align-items: center; gap: 6px;
+}
+.badge {
+  background: rgba(251,191,36,0.2); border: 1px solid rgba(251,191,36,0.3);
+  border-radius: 20px; padding: 2px 8px;
+  font-size: 10px; font-weight: 800; color: var(--amber);
+}
+
+.change-item {
+  margin: 0 12px 10px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 11px 14px;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.change-row { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.4; }
+.change-before { color: var(--rose); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 12px; text-decoration: line-through; opacity: 0.8; }
+.change-arrow { color: var(--dim); font-size: 11px; margin-top: 1px; flex-shrink: 0; }
+.change-after { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.change-reason { font-size: 12px; font-weight: 600; color: var(--muted); padding-left: 2px; }
+
+/* No changes */
+.no-changes {
+  padding: 16px 18px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 700; color: var(--green);
+}
+
+/* Copy / actions row */
+.result-actions {
+  padding: 12px 14px;
+  display: flex; gap: 8px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.act-btn {
+  flex: 1; padding: 11px 8px;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  border-radius: 12px; color: var(--muted);
+  font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; -webkit-appearance: none;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.act-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+.act-btn:active { transform: scale(0.96); }
+.act-btn.success { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.35); color: var(--green); }
+
+/* Error */
+.error-box {
+  background: rgba(251,113,133,0.1); border: 1px solid rgba(251,113,133,0.25);
+  border-radius: 14px; padding: 14px 16px;
+  font-size: 13px; font-weight: 600; color: #fda4af; line-height: 1.6;
+  display: none;
+}
+
+/* History */
+.history-section { margin-top: 4px; }
+.history-title {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--dim); margin-bottom: 10px; padding: 0 2px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.history-clear { font-size: 11px; font-weight: 700; color: var(--dim); background: none; border: none; cursor: pointer; color: var(--rose); opacity: 0.7; transition: opacity 0.2s; }
+.history-clear:hover { opacity: 1; }
+
+.hist-item {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
+  cursor: pointer; transition: all 0.2s;
+}
+.hist-item:hover { background: rgba(255,255,255,0.08); border-color: var(--border2); }
+.hist-item:active { transform: scale(0.99); }
+.hist-original { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hist-fixed { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hist-time { font-size: 10px; color: var(--dim); margin-top: 5px; }
+
+@media(max-width:480px) {
+  .setup-card { padding: 28px 20px; border-radius: 22px; }
+  .app-header { padding: calc(var(--safe-top) + 10px) 14px 10px; }
+  .app-body { padding: 14px 12px calc(var(--safe-bottom) + 20px); gap: 12px; }
+  #text-input { font-size: 16px; min-height: 110px; }
+  .result-text { font-size: 14px; }
+  .change-item { margin: 0 8px 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-mesh">
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+</div>
+
+<!-- ── SETUP ── -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <div class="app-icon">✍️</div>
+    <div class="setup-title">ClearText AI</div>
+    <div class="setup-sub">
+      AI що виправляє речення — грамотно, зрозуміло і з поясненням кожної помилки.<br>
+      Потрібен безкоштовний ключ: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a>
+    </div>
+    <div class="features">
+      <div class="chip">🇺🇦 Українська</div>
+      <div class="chip">🇷🇺 Російська</div>
+      <div class="chip">✅ Пояснення</div>
+      <div class="chip">📋 Копіювання</div>
+      <div class="chip">🕓 Історія</div>
+    </div>
+    <label class="field-label" for="apiKeyInput">Google API ключ</label>
+    <div class="key-wrap">
+      <input type="password" class="key-input" id="apiKeyInput" placeholder="AIzaSy...">
+      <button class="key-toggle" id="keyToggle" type="button">👁</button>
+    </div>
+    <button class="btn-enter" id="startBtn" type="button">✦ Почати</button>
+    <div class="setup-note">🔒 Ключ не зберігається — тільки в пам'яті вкладки</div>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<div id="app-screen">
+  <div class="app-header">
+    <div class="app-header-icon">✍️</div>
+    <div class="app-header-info">
+      <div class="app-header-title">ClearText AI</div>
+      <div class="app-header-sub">Виправлення тексту</div>
+    </div>
+    <select class="model-sel" id="modelSelect">
+      <option value="gemini-2.5-flash">2.5-flash ✓</option>
+      <option value="gemini-3.1-flash-lite">3.1-lite ✓</option>
+      <option value="gemini-3-flash-preview">3-flash ✓</option>
+      <option value="gemini-2.5-pro">2.5-pro</option>
+    </select>
+  </div>
+
+  <div class="app-body">
+
+    <!-- Input card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span>✏️</span> Ваш текст</div>
+        <div class="char-count" id="charCount">0 / 800</div>
+      </div>
+      <textarea id="text-input" placeholder="Напишіть речення яке хочете виправити…&#10;Наприклад: «я вчора ходив магазін купляв хліб і молоко»"></textarea>
+      <div class="lang-row">
+        <span class="lang-label">Мова:</span>
+        <button class="lang-btn active" data-lang="uk" type="button">🇺🇦 Українська</button>
+        <button class="lang-btn" data-lang="ru" type="button">🇷🇺 Російська</button>
+        <button class="lang-btn" data-lang="auto" type="button">🔍 Авто</button>
+      </div>
+    </div>
+
+    <!-- Fix button -->
+    <button class="btn-fix" id="fixBtn" type="button">
+      <span class="btn-label">✦ Виправити текст</span>
+      <div class="spinner"></div>
+    </button>
+
+    <!-- Error -->
+    <div class="error-box" id="errorBox"></div>
+
+    <!-- Result -->
+    <div class="card" id="result-card">
+      <div class="card-header">
+        <div class="card-title"><span>✅</span> Виправлений текст</div>
+      </div>
+      <div class="result-text" id="result-text"></div>
+      <div class="changes-header">
+        <span>🔍 Зміни</span>
+        <div class="badge" id="changes-badge">0</div>
+      </div>
+      <div id="changes-list"></div>
+      <div class="result-actions">
+        <button class="act-btn" id="copyBtn" type="button">📋 Копіювати</button>
+        <button class="act-btn" id="useBtn" type="button">↩️ Редагувати</button>
+        <button class="act-btn" id="clearBtn" type="button">🗑 Очистити</button>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="history-section" id="historySection" style="display:none">
+      <div class="history-title">
+        <span>🕓 Останні виправлення</span>
+        <button class="history-clear" id="historyClearBtn" type="button">очистити</button>
+      </div>
+      <div id="historyList"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let apiKey = '';
+let selectedLang = 'uk';
+let history = [];
+
+// ── SETUP ──
+document.getElementById('keyToggle').onclick = () => {
+  const inp = document.getElementById('apiKeyInput');
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  document.getElementById('keyToggle').textContent = show ? '🙈' : '👁';
+};
+
+document.getElementById('startBtn').onclick = () => {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key || key.length < 20) {
+    const inp = document.getElementById('apiKeyInput');
+    inp.style.borderColor = 'rgba(251,113,133,0.6)';
+    inp.style.boxShadow = '0 0 0 3px rgba(251,113,133,0.15)';
+    inp.animate([{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(-3px)'},{transform:'translateX(0)'}], {duration:280});
+    setTimeout(()=>{ inp.style.borderColor=''; inp.style.boxShadow=''; }, 2000);
+    return;
+  }
+  apiKey = key;
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'flex';
+  document.getElementById('text-input').focus();
+};
+document.getElementById('apiKeyInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('startBtn').click(); });
+
+// ── LANG BUTTONS ──
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedLang = btn.dataset.lang;
+  };
+});
+
+// ── CHAR COUNT ──
+const textInput = document.getElementById('text-input');
+textInput.addEventListener('input', () => {
+  const len = textInput.value.length;
+  document.getElementById('charCount').textContent = `${len} / 800`;
+  if (len > 800) textInput.value = textInput.value.slice(0, 800);
+});
+
+// ── FIX ──
+document.getElementById('fixBtn').onclick = fixText;
+textInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.ctrlKey) fixText();
+});
+
+async function fixText() {
+  const text = textInput.value.trim();
+  if (!text) {
+    textInput.animate([{borderColor:'rgba(251,113,133,0.5)'},{borderColor:''}], {duration:400});
+    return;
+  }
+
+  const btn = document.getElementById('fixBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  document.getElementById('result-card').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+
+  const langMap = { uk: 'українською мовою', ru: 'русским языком', auto: 'визначивши мову автоматично' };
+  const langNote = langMap[selectedLang] || 'українською мовою';
+
+  const prompt = `Ти — асистент з виправлення тексту для людей з вадами слуху, які пишуть неграмотно.
+
+Виправ наступний текст ${langNote}. Зроби речення граматично правильним, зрозумілим і природним.
+
+ТЕКСТ ДЛЯ ВИПРАВЛЕННЯ:
+"${text}"
+
+Відповідай ВИКЛЮЧНО у форматі JSON, без будь-яких пояснень поза JSON:
+{
+  "corrected": "виправлений текст",
+  "changes": [
+    {
+      "before": "помилкове слово або фраза",
+      "after": "правильний варіант",
+      "reason": "коротке пояснення (1 речення)"
+    }
+  ],
+  "noChanges": false
+}
+
+Якщо текст вже правильний, поверни: {"corrected": "${text}", "changes": [], "noChanges": true}
+ВАЖЛИВО: відповідай тільки валідним JSON, без markdown і додаткового тексту.`;
+
+  try {
+    const model = document.getElementById('modelSelect').value;
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.3, maxOutputTokens: 1024 }
+        })
+      }
+    );
+    const data = await res.json();
+
+    if (data.error) {
+      showError(data.error);
+      return;
+    }
+
+    let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    raw = raw.replace(/```json|```/g, '').trim();
+
+    let parsed;
+    try { parsed = JSON.parse(raw); }
+    catch(e) {
+      // fallback: extract JSON from response
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (match) parsed = JSON.parse(match[0]);
+      else throw new Error('Не вдалося розпізнати відповідь AI');
+    }
+
+    showResult(parsed, text);
+    saveToHistory(text, parsed.corrected);
+
+  } catch(err) {
+    document.getElementById('errorBox').textContent = `⚠️ ${err.message}`;
+    document.getElementById('errorBox').style.display = 'block';
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+function showError(err) {
+  const box = document.getElementById('errorBox');
+  const isQuota = err.message?.toLowerCase().includes('quota');
+  const retry = err.message?.match(/retry in ([\d.]+)s/i);
+  const sec = retry ? Math.ceil(parseFloat(retry[1])) : null;
+  if (isQuota) {
+    box.innerHTML = `⚠️ Ліміт вичерпано${sec ? ` — спробуй через ${sec}с` : ''}. Обери іншу модель.`;
+  } else if (err.code === 400 || err.code === 403) {
+    box.textContent = '🔑 Невірний API ключ. Перезавантаж сторінку.';
+  } else {
+    box.textContent = `⚠️ ${err.message}`;
+  }
+  box.style.display = 'block';
+}
+
+function showResult(data, original) {
+  const card = document.getElementById('result-card');
+  const resultText = document.getElementById('result-text');
+  const changesList = document.getElementById('changes-list');
+  const badge = document.getElementById('changes-badge');
+
+  resultText.textContent = data.corrected;
+  changesList.innerHTML = '';
+
+  if (data.noChanges || data.changes.length === 0) {
+    badge.textContent = '0';
+    changesList.innerHTML = `<div class="no-changes">✅ Текст вже правильний! Помилок не знайдено.</div>`;
+  } else {
+    badge.textContent = data.changes.length;
+    data.changes.forEach(c => {
+      const item = document.createElement('div');
+      item.className = 'change-item';
+      item.innerHTML = `
+        <div class="change-row">
+          <span class="change-before">${escHtml(c.before)}</span>
+          <span class="change-arrow">→</span>
+          <span class="change-after">${escHtml(c.after)}</span>
+        </div>
+        <div class="change-reason">${escHtml(c.reason)}</div>`;
+      changesList.appendChild(item);
+    });
+  }
+
+  card.style.display = 'block';
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Action buttons
+document.getElementById('copyBtn').onclick = async () => {
+  const text = document.getElementById('result-text').textContent;
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✅ Скопійовано!';
+    btn.classList.add('success');
+    setTimeout(() => { btn.textContent = '📋 Копіювати'; btn.classList.remove('success'); }, 2000);
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✅ Скопійовано!'; btn.classList.add('success');
+    setTimeout(() => { btn.textContent = '📋 Копіювати'; btn.classList.remove('success'); }, 2000);
+  }
+};
+
+document.getElementById('useBtn').onclick = () => {
+  const text = document.getElementById('result-text').textContent;
+  if (!text) return;
+  textInput.value = text;
+  textInput.dispatchEvent(new Event('input'));
+  document.getElementById('result-card').style.display = 'none';
+  textInput.focus();
+  textInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+};
+
+document.getElementById('clearBtn').onclick = () => {
+  textInput.value = '';
+  textInput.dispatchEvent(new Event('input'));
+  document.getElementById('result-card').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+  textInput.focus();
+};
+
+// ── HISTORY ──
+function saveToHistory(original, corrected) {
+  if (original === corrected) return;
+  history.unshift({ original, corrected, time: new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'}) });
+  if (history.length > 10) history.pop();
+  renderHistory();
+}
+
+function renderHistory() {
+  const sec = document.getElementById('historySection');
+  const list = document.getElementById('historyList');
+  if (history.length === 0) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  list.innerHTML = '';
+  history.forEach((item, i) => {
+    const el = document.createElement('div');
+    el.className = 'hist-item';
+    el.innerHTML = `
+      <div class="hist-original">❌ ${escHtml(item.original)}</div>
+      <div class="hist-fixed">✅ ${escHtml(item.corrected)}</div>
+      <div class="hist-time">${item.time}</div>`;
+    el.onclick = () => {
+      textInput.value = item.original;
+      textInput.dispatchEvent(new Event('input'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    list.appendChild(el);
+  });
+}
+
+document.getElementById('historyClearBtn').onclick = () => {
+  history = [];
+  renderHistory();
+};
+</script>
+</body>
+</html>
