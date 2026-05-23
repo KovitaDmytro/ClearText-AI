@@ -27,9 +27,9 @@
   --blue-glow: rgba(96,165,250,0.25);
   --amber: #fbbf24;
   --rose: #fb7185;
-  --text: rgba(255,255,255,0.92);
-  --muted: rgba(255,255,255,0.5);
-  --dim: rgba(255,255,255,0.25);
+  --text: rgba(255,255,255,1);
+  --muted: rgba(255,255,255,0.75);
+  --dim: rgba(255,255,255,0.5);
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -338,8 +338,8 @@ body {
 }
 .app-header-icon { font-size: 22px; }
 .app-header-info { flex: 1; }
-.app-header-title { font-size: 17px; font-weight: 900; letter-spacing: -0.02em; background: linear-gradient(90deg,#fff,var(--green)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.app-header-sub { font-size: 10px; font-weight: 700; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.app-header-title { font-size: 17px; font-weight: 900; letter-spacing: -0.02em; color: #ffffff; -webkit-text-fill-color: #ffffff; }
+.app-header-sub { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.7); letter-spacing: 0.1em; text-transform: uppercase; }
 
 .model-sel { display: none !important; } .model-sel-hidden {
   background: rgba(255,255,255,0.07); border: 1px solid var(--border);
