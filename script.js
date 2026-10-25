@@ -2322,6 +2322,7 @@ route();
   const nav = document.getElementById('tabBar');
   const ind = document.getElementById('tabIndicator');
   if (!nav || !ind) return;
+  if (document.documentElement.classList.contains('is-android')) return; // Android: звичайні тапи, без iOS-жесту
   const btns = () => [...nav.querySelectorAll('.tab-btn')];
   let dragging = false, moved = false, startX = 0, target = null, pid = null;
 
