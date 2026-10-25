@@ -4,493 +4,91 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- ДОДАНО НОВИЙ РЯДОК НИЖЧЕ -->
 <meta name="mobile-web-app-capable" content="yes"> 
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0e1320">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0054e3">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <title>ClearText AI</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-:root {
-  --bg: #0e1320;
-  --surface: rgba(255,255,255,0.18);
-  --surface2: rgba(255,255,255,0.22);
-  --border: rgba(255,255,255,0.1);
-  --border2: rgba(255,255,255,0.16);
-  --blur: blur(36px) saturate(180%);
-  --blur-sm: blur(16px) saturate(160%);
-  --green: #34d399;
-  --green-glow: rgba(52,211,153,0.25);
-  --blue: #60a5fa;
-  --blue-glow: rgba(96,165,250,0.25);
-  --amber: #fbbf24;
-  --rose: #fb7185;
-  --text: rgba(255,255,255,1);
-  --muted: rgba(255,255,255,0.75);
-  --dim: rgba(255,255,255,0.5);
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-html, body { height: 100%; height: 100dvh; }
-body {
-  font-family: 'Nunito', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100dvh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  position: relative;
-}
-
-/* BG */
-.bg-mesh { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.bg-orb { position: absolute; border-radius: 50%; filter: blur(90px); }
-.bg-orb:nth-child(1) { width: 60vw; height: 60vw; background: radial-gradient(circle, #065f46, transparent 70%); top: -15%; left: -15%; opacity: 0.6; animation: o1 22s ease-in-out infinite alternate; }
-.bg-orb:nth-child(2) { width: 50vw; height: 50vw; background: radial-gradient(circle, #1e40af, transparent 70%); bottom: -10%; right: -10%; opacity: 0.5; animation: o2 18s ease-in-out infinite alternate; }
-.bg-orb:nth-child(3) { width: 40vw; height: 40vw; background: radial-gradient(circle, #6b21a8, transparent 70%); top: 40%; left: 35%; opacity: 0.35; animation: o1 14s ease-in-out infinite alternate-reverse; }
-@keyframes o1 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(5vw,-4vh) scale(1.08)} }
-@keyframes o2 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(-4vw,5vh) scale(0.92)} }
-
-/* ── NO API SCREEN ── */
-#no-api-screen {
-  position: relative; z-index: 10;
-  min-height: 100dvh;
-  display: none;
-  flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: calc(var(--safe-top) + 24px) 20px calc(var(--safe-bottom) + 24px);
-}
-.no-api-card {
-  width: 100%; max-width: 400px;
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  border: 1px solid rgba(251,113,133,0.25);
-  border-radius: 26px;
-  padding: 40px 32px;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.18);
-  text-align: center;
-  animation: cardIn 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
-}
-.no-api-icon { font-size: 48px; margin-bottom: 16px; }
-.no-api-title { font-size: 22px; font-weight: 900; color: var(--rose); margin-bottom: 10px; }
-.no-api-text { font-size: 14px; color: var(--muted); line-height: 1.7; }
-
-/* ── ADMIN LOGIN SCREEN ── */
-#admin-login-screen {
-  position: relative; z-index: 10;
-  min-height: 100dvh;
-  display: none;
-  flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: calc(var(--safe-top) + 24px) 20px calc(var(--safe-bottom) + 24px);
-}
-
-.admin-login-card {
-  width: 100%; max-width: 420px;
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  border: 1px solid rgba(96,165,250,0.25);
-  border-radius: 26px;
-  padding: 40px 32px;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.18);
-  animation: cardIn 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
-}
-@keyframes cardIn {
-  from { opacity:0; transform:translateY(28px) scale(0.96); }
-  to   { opacity:1; transform:translateY(0) scale(1); }
-}
-
-.admin-login-icon {
-  width: 68px; height: 68px;
-  background: linear-gradient(135deg, rgba(96,165,250,0.3), rgba(139,92,246,0.25));
-  border: 1px solid rgba(96,165,250,0.35);
-  border-radius: 22px;
-  margin: 0 auto 18px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 30px;
-  box-shadow: 0 8px 32px rgba(96,165,250,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
-}
-.admin-login-title {
-  font-size: 24px; font-weight: 900; text-align: center; letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #fff 30%, var(--blue));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  margin-bottom: 6px;
-}
-.admin-login-sub { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 24px; }
-
-.field-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 7px; display: block; }
-.field-wrap { position: relative; margin-bottom: 14px; }
-.field-input {
-  width: 100%;
-  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
-  border-radius: 14px; padding: 13px 46px 13px 16px;
-  color: var(--text); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600;
-  outline: none; transition: all 0.2s;
-  backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
-  -webkit-appearance: none;
-}
-.field-input::placeholder { color: var(--dim); }
-.field-input:focus { border-color: rgba(96,165,250,0.5); box-shadow: 0 0 0 3px rgba(96,165,250,0.12); background: rgba(255,255,255,0.1); }
-.field-input.field-input--no-icon { padding-right: 16px; }
-
-.field-toggle { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 17px; color: var(--muted); transition: color 0.2s; }
-.field-toggle:hover { color: var(--blue); }
-
-.btn-admin-login {
-  width: 100%; padding: 15px;
-  background: linear-gradient(135deg, rgba(96,165,250,0.55), rgba(139,92,246,0.5));
-  border: 1px solid rgba(96,165,250,0.4); border-radius: 14px;
-  color: #fff; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900;
-  cursor: pointer; letter-spacing: 0.04em;
-  box-shadow: 0 4px 28px rgba(96,165,250,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
-  transition: all 0.2s; -webkit-appearance: none;
-}
-.btn-admin-login:hover { transform: translateY(-1px); box-shadow: 0 8px 36px rgba(96,165,250,0.4); }
-.btn-admin-login:active { transform: scale(0.98); }
-
-.admin-login-error {
-  background: rgba(251,113,133,0.1); border: 1px solid rgba(251,113,133,0.3);
-  border-radius: 10px; padding: 10px 14px;
-  font-size: 13px; font-weight: 600; color: #fda4af;
-  display: none; margin-top: 12px; text-align: center;
-}
-.admin-back-link {
-  display: block; text-align: center; margin-top: 16px;
-  font-size: 12px; color: var(--dim); cursor: pointer; text-decoration: underline;
-  transition: color 0.2s;
-}
-.admin-back-link:hover { color: var(--muted); }
-
-/* ── ADMIN PANEL ── */
-#admin-screen {
-  display: none;
-  position: relative; z-index: 10;
-  min-height: 100dvh;
-  flex-direction: column;
-}
-
-.admin-header {
-  position: sticky; top: 0; z-index: 50;
-  padding: calc(var(--safe-top) + 12px) 20px 12px;
-  background: rgba(8,11,20,0.7);
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border-bottom: 1px solid rgba(96,165,250,0.15);
-  display: flex; align-items: center; gap: 12px;
-}
-.admin-header-badge {
-  background: rgba(96,165,250,0.15); border: 1px solid rgba(96,165,250,0.3);
-  border-radius: 8px; padding: 3px 9px;
-  font-size: 10px; font-weight: 800; color: var(--blue); letter-spacing: 0.1em; text-transform: uppercase;
-}
-.admin-header-title { font-size: 17px; font-weight: 900; color: var(--text); flex: 1; }
-.btn-admin-logout {
-  background: rgba(251,113,133,0.1); border: 1px solid rgba(251,113,133,0.25);
-  border-radius: 10px; padding: 7px 13px;
-  font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700; color: var(--rose);
-  cursor: pointer; transition: all 0.2s; -webkit-appearance: none;
-}
-.btn-admin-logout:hover { background: rgba(251,113,133,0.18); }
-
-.admin-body {
-  flex: 1; padding: 24px 16px calc(var(--safe-bottom) + 28px);
-  display: flex; flex-direction: column; gap: 18px;
-  max-width: 680px; margin: 0 auto; width: 100%;
-}
-
-.admin-section {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-  border: 1px solid var(--border); border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.25);
-}
-.admin-section-header {
-  padding: 14px 18px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.admin-section-title { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 7px; }
-.admin-section-body { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
-
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px rgba(52,211,153,0.6); display: inline-block; }
-.status-dot.off { background: var(--rose); box-shadow: 0 0 8px rgba(251,113,133,0.6); }
-
-.admin-key-wrap { position: relative; }
-.admin-key-input {
-  width: 100%;
-  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
-  border-radius: 12px; padding: 12px 46px 12px 14px;
-  color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 400;
-  outline: none; transition: all 0.2s;
-  -webkit-appearance: none;
-}
-.admin-key-input::placeholder { color: var(--dim); font-family: 'Nunito', sans-serif; }
-.admin-key-input:focus { border-color: rgba(52,211,153,0.5); box-shadow: 0 0 0 3px rgba(52,211,153,0.12); }
-
-.btn-save {
-  padding: 12px 20px;
-  background: linear-gradient(135deg, rgba(52,211,153,0.5), rgba(16,185,129,0.6));
-  border: 1px solid rgba(52,211,153,0.35); border-radius: 12px;
-  color: #fff; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
-  cursor: pointer; transition: all 0.2s; -webkit-appearance: none; white-space: nowrap;
-  box-shadow: 0 4px 20px rgba(52,211,153,0.2);
-}
-.btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(52,211,153,0.35); }
-.btn-save:active { transform: scale(0.97); }
-.btn-save.saved { background: rgba(52,211,153,0.2); }
-
-.admin-row { display: flex; gap: 10px; align-items: flex-end; }
-.admin-row .admin-key-wrap { flex: 1; }
-
-.admin-success-msg {
-  font-size: 12px; font-weight: 700; color: var(--green);
-  display: none; animation: fadeIn 0.3s ease;
-}
-@keyframes fadeIn { from{opacity:0} to{opacity:1} }
-
-/* Models list */
-.models-list { display: flex; flex-direction: column; gap: 8px; }
-.model-item {
-  display: flex; align-items: center; gap: 12px;
-  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 12px; padding: 12px 14px;
-  transition: all 0.2s;
-}
-.model-item:hover { background: rgba(255,255,255,0.07); }
-.model-item-name { flex: 1; font-size: 13px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text); }
-.model-item-label { font-size: 11px; font-weight: 600; color: var(--dim); }
-.model-toggle {
-  position: relative; width: 40px; height: 22px; flex-shrink: 0;
-}
-.model-toggle input { opacity: 0; width: 0; height: 0; }
-.model-toggle-slider {
-  position: absolute; inset: 0; cursor: pointer;
-  background: rgba(255,255,255,0.1); border-radius: 22px; transition: 0.25s;
-  border: 1px solid rgba(255,255,255,0.12);
-}
-.model-toggle-slider::before {
-  content: ''; position: absolute;
-  width: 16px; height: 16px; border-radius: 50%; background: #fff;
-  left: 2px; top: 2px; transition: 0.25s;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-}
-.model-toggle input:checked + .model-toggle-slider { background: rgba(52,211,153,0.4); border-color: rgba(52,211,153,0.5); }
-.model-toggle input:checked + .model-toggle-slider::before { transform: translateX(18px); }
-
-.model-add-row { display: flex; gap: 8px; }
-.model-add-input {
-  flex: 1;
-  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
-  border-radius: 12px; padding: 11px 14px;
-  color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px;
-  outline: none; transition: all 0.2s; -webkit-appearance: none;
-}
-.model-add-input::placeholder { color: var(--dim); font-family: 'Nunito', sans-serif; font-size: 13px; }
-.model-add-input:focus { border-color: rgba(96,165,250,0.5); box-shadow: 0 0 0 3px rgba(96,165,250,0.1); }
-.btn-add-model {
-  padding: 11px 16px;
-  background: rgba(96,165,250,0.15); border: 1px solid rgba(96,165,250,0.3);
-  border-radius: 12px; color: var(--blue);
-  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
-  cursor: pointer; transition: all 0.2s; white-space: nowrap; -webkit-appearance: none;
-}
-.btn-add-model:hover { background: rgba(96,165,250,0.25); }
-.btn-del-model {
-  background: none; border: none; cursor: pointer;
-  font-size: 16px; color: var(--dim); transition: color 0.2s; padding: 2px 4px;
-  line-height: 1;
-}
-.btn-del-model:hover { color: var(--rose); }
-
-/* Admin credentials section */
-.cred-grid { display: flex; flex-direction: column; gap: 10px; }
-
-/* Admin info box */
-.info-box {
-  background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2);
-  border-radius: 12px; padding: 12px 14px;
-  font-size: 12px; font-weight: 600; color: rgba(96,165,250,0.8); line-height: 1.6;
-}
-
-/* ── MAIN APP ── */
-#app-screen {
-  display: none;
-  position: relative; z-index: 10;
-  min-height: 100dvh;
-  flex-direction: column;
-}
-
-.app-header {
-  position: sticky; top: 0; z-index: 50;
-  padding: calc(var(--safe-top) + 12px) 20px 12px;
-  background: rgba(8,11,20,0.6);
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 12px;
-}
-.app-header-icon { font-size: 22px; }
-.app-header-info { flex: 1; }
-.app-header-title { font-size: 17px; font-weight: 900; letter-spacing: -0.02em; color: #ffffff; -webkit-text-fill-color: #ffffff; }
-.app-header-sub { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.7); letter-spacing: 0.1em; text-transform: uppercase; }
-
-.model-sel { display: none !important; } .model-sel-hidden {
-  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
-  border-radius: 10px; color: var(--muted);
-  font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700;
-  padding: 5px 9px; outline: none; cursor: pointer; max-width: 150px;
-  -webkit-appearance: none; backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
-}
-.model-sel-hidden option { background: #0f172a; }
-
-.app-body {
-  flex: 1; padding: 20px 16px calc(var(--safe-bottom) + 24px);
-  display: flex; flex-direction: column; gap: 16px;
-}
-@media(min-width:640px) { .app-body { max-width: 720px; margin: 0 auto; width: 100%; padding: 28px 24px calc(var(--safe-bottom) + 28px); } }
-
-.card {
-  background: rgba(255,255,255,0.055);
-  backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-  border: 1px solid var(--border); border-radius: 20px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
-  overflow: hidden;
-}
-.card-header {
-  padding: 14px 18px 10px;
-  display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.card-title { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 7px; }
-.card-title span { font-size: 14px; }
-.char-count { font-size: 11px; font-weight: 700; color: var(--dim); font-family: 'JetBrains Mono', monospace; }
-
-#text-input {
-  width: 100%; background: none; border: none; outline: none; resize: none;
-  color: var(--text); font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 600;
-  line-height: 1.7; padding: 14px 18px 18px; min-height: 130px; max-height: 260px;
-  overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent;
-  -webkit-appearance: none;
-}
-#text-input::-webkit-scrollbar { width: 3px; }
-#text-input::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-#text-input::placeholder { color: var(--dim); font-weight: 500; }
-
-.lang-row {
-  padding: 10px 18px 14px;
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-.lang-label { font-size: 11px; font-weight: 700; color: var(--dim); margin-right: 2px; }
-.lang-btn {
-  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
-  border-radius: 20px; padding: 5px 12px;
-  font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted);
-  cursor: pointer; transition: all 0.2s; -webkit-appearance: none;
-}
-.lang-btn.active { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.4); color: var(--green); }
-.lang-btn:hover { background: rgba(255,255,255,0.1); }
-
-.btn-fix {
-  width: 100%; padding: 16px;
-  background: linear-gradient(135deg, rgba(52,211,153,0.5), rgba(96,165,250,0.45));
-  border: 1px solid rgba(52,211,153,0.35); border-radius: 16px;
-  color: #fff; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900;
-  cursor: pointer; letter-spacing: 0.03em;
-  box-shadow: 0 4px 28px rgba(52,211,153,0.2), inset 0 1px 0 rgba(255,255,255,0.18);
-  transition: all 0.2s; -webkit-appearance: none; position: relative; overflow: hidden;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.btn-fix::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent); opacity: 0; transition: opacity 0.2s; }
-.btn-fix:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 36px rgba(52,211,153,0.35), inset 0 1px 0 rgba(255,255,255,0.18); }
-.btn-fix:hover:not(:disabled)::before { opacity: 1; }
-.btn-fix:active:not(:disabled) { transform: scale(0.98); }
-.btn-fix:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-fix .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.btn-fix.loading .btn-label { display: none; }
-.btn-fix.loading .spinner { display: block; }
-
-#result-card { display: none; animation: fadeUp 0.4s cubic-bezier(0.34,1.2,0.64,1) forwards; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-
-.result-text { padding: 16px 18px; font-size: 18px; font-weight: 600; line-height: 1.75; color: var(--text); border-bottom: 1px solid rgba(255,255,255,0.06); }
-
-.changes-header { padding: 12px 18px 8px; font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-.badge { background: rgba(251,191,36,0.2); border: 1px solid rgba(251,191,36,0.3); border-radius: 20px; padding: 2px 8px; font-size: 10px; font-weight: 800; color: var(--amber); }
-
-.change-item { margin: 0 12px 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 11px 14px; display: flex; flex-direction: column; gap: 5px; }
-.change-row { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.4; }
-.change-before { color: var(--rose); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 15px; text-decoration: line-through; opacity: 0.8; }
-.change-arrow { color: var(--dim); font-size: 14px; margin-top: 1px; flex-shrink: 0; }
-.change-after { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 15px; }
-.change-reason { font-size: 15px; font-weight: 600; color: var(--muted); padding-left: 2px; }
-
-.no-changes { padding: 16px 18px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: var(--green); }
-
-.result-actions { padding: 12px 14px; display: flex; gap: 8px; border-top: 1px solid rgba(255,255,255,0.06); }
-.act-btn { flex: 1; padding: 11px 8px; background: rgba(255,255,255,0.12); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; -webkit-appearance: none; display: flex; align-items: center; justify-content: center; gap: 5px; }
-.act-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
-.act-btn:active { transform: scale(0.96); }
-.act-btn.success { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.35); color: var(--green); }
-
-.error-box { background: rgba(251,113,133,0.1); border: 1px solid rgba(251,113,133,0.25); border-radius: 14px; padding: 14px 16px; font-size: 13px; font-weight: 600; color: #fda4af; line-height: 1.6; display: none; }
-
-.history-section { margin-top: 4px; }
-.history-title { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; padding: 0 2px; display: flex; align-items: center; justify-content: space-between; }
-.history-clear { font-size: 12px; font-weight: 700; color: var(--rose); background: none; border: none; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
-.history-clear:hover { opacity: 1; }
-.hist-item { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
-.hist-item:hover { background: rgba(255,255,255,0.08); border-color: var(--border2); }
-.hist-item:active { transform: scale(0.99); }
-.hist-original { font-size: 15px; font-weight: 600; color: var(--muted); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.hist-fixed { font-size: 16px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.hist-time { font-size: 13px; color: var(--dim); margin-top: 5px; }
-
-@media(max-width:480px) {
-  .admin-login-card, .no-api-card { padding: 28px 20px; border-radius: 22px; }
-  .app-header { padding: calc(var(--safe-top) + 10px) 14px 10px; }
-  .app-body { padding: 14px 12px calc(var(--safe-bottom) + 20px); gap: 12px; }
-  #text-input { font-size: 16px; min-height: 110px; }
-  .result-text { font-size: 17px; }
-  .change-item { margin: 0 8px 8px; }
-  .admin-body { padding: 16px 12px; }
-}
-</style>
+<link rel="stylesheet" href="style.css?v=20261024m">
+<link rel="stylesheet" href="retro.css?v=2000a">
 </head>
 <body>
 
-<div class="bg-mesh">
-  <div class="bg-orb"></div>
-  <div class="bg-orb"></div>
-  <div class="bg-orb"></div>
-</div>
+<div class="bg-mesh"></div>
 
 <!-- ── NO API SCREEN ── -->
 <div id="no-api-screen">
   <div class="no-api-card">
-    <div class="no-api-icon">🤖</div>
-    <div class="no-api-title" style="color:var(--text)">ClearText AI</div>
+    <div class="ct-logo ct-logo--splash">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="ns" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#8b6cff"/>
+            <stop offset="100%" stop-color="#ff6aa0"/>
+          </linearGradient>
+        </defs>
+        <rect width="80" height="80" rx="19.2" fill="#0d0919"/>
+        <path d="M17.6 27.2 Q17.6 20.8 24 20.8 L56 20.8 Q62.4 20.8 62.4 27.2 L62.4 44.8 Q62.4 51.2 56 51.2 L40 51.2 L28.8 60.8 L30.4 51.2 L24 51.2 Q17.6 51.2 17.6 44.8 Z" fill="none" stroke="url(#ns)" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M32 36.8 L37.6 42.4 L48 29.6" fill="none" stroke="url(#ns)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M64 8 Q65.6 13.6 71.2 15.2 Q65.6 16.8 64 22.4 Q62.4 16.8 56.8 15.2 Q62.4 13.6 64 8 Z" fill="url(#ns)"/>
+      </svg>
+    </div>
+    <div class="no-api-title">ClearText AI</div>
     <div class="no-api-text">
-      Вибачте, на разі сервіс не працює.<br>
-      Спробуйте будь ласка пізніше.
+      <span id="noApiTextNoKey">Вибачте, на разі сервіс не працює.<br>Спробуйте будь ласка пізніше.</span>
+      <span id="noApiTextMaintenance" style="display:none">Ведуться технічні роботи.<br>Спробуйте будь ласка пізніше.</span>
       <a id="goAdminLink" style="display:none"></a>
     </div>
+  </div>
+</div>
+
+<!-- ── OFFLINE SCREEN ── -->
+<div id="offline-screen" style="display:none">
+  <div class="no-api-card">
+    <div class="ct-logo ct-logo--splash" style="margin-bottom:24px">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="ol" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#8b6cff"/><stop offset="100%" stop-color="#ff6aa0"/></linearGradient></defs>
+        <rect width="80" height="80" rx="19.2" fill="#0d0919"/>
+        <path d="M17.6 27.2 Q17.6 20.8 24 20.8 L56 20.8 Q62.4 20.8 62.4 27.2 L62.4 44.8 Q62.4 51.2 56 51.2 L40 51.2 L28.8 60.8 L30.4 51.2 L24 51.2 Q17.6 51.2 17.6 44.8 Z" fill="none" stroke="url(#ol)" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M32 36.8 L37.6 42.4 L48 29.6" fill="none" stroke="url(#ol)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M64 8 Q65.6 13.6 71.2 15.2 Q65.6 16.8 64 22.4 Q62.4 16.8 56.8 15.2 Q62.4 13.6 64 8 Z" fill="url(#ol)"/>
+      </svg>
+    </div>
+    <div class="no-api-title">ClearText AI</div>
+    <div class="status-tile">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+    </div>
+    <div class="no-api-text"><strong style="display:block;font-size:19px;font-weight:700;color:var(--ct-text);margin-bottom:6px">Немає підключення</strong>Увімкніть мобільні дані або Wi-Fi,<br>щоб скористатися ClearText AI.</div>
+    <button class="btn-glass" onclick="if(navigator.onLine){hide('offline-screen');route();}else{this.textContent='Ще немає…';setTimeout(()=>this.innerHTML='<svg width=\'15\' height=\'15\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'23 4 23 10 17 10\'/><path d=\'M20.49 15a9 9 0 1 1-2.12-9.36L23 10\'/></svg> Спробувати знову',1500);}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Спробувати знову
+    </button>
   </div>
 </div>
 
 <!-- ── ADMIN LOGIN SCREEN ── -->
 <div id="admin-login-screen">
   <div class="admin-login-card">
-    <div class="admin-login-icon">🔐</div>
+    <div class="term-titlebar">
+      <span class="term-dot term-dot--r"></span><span class="term-dot term-dot--y"></span><span class="term-dot term-dot--g"></span>
+      <span class="term-titlebar-path">cleartext@admin:~/auth</span>
+    </div>
+    <div class="ct-logo ct-logo--admin">
+      <svg width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="na" x1="0" y1="0" x2="68" y2="68" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#60a5fa"/>
+            <stop offset="100%" stop-color="#8b5cf6"/>
+          </linearGradient>
+        </defs>
+        <rect width="68" height="68" rx="16.32" fill="#0b1120"/>
+        <rect width="68" height="68" rx="16.32" fill="none" stroke="url(#na)" stroke-width="1" stroke-opacity=".3"/>
+        <path d="M14.96 23.12 Q14.96 17.68 20.4 17.68 L47.6 17.68 Q53.04 17.68 53.04 23.12 L53.04 38.08 Q53.04 43.52 47.6 43.52 L34 43.52 L24.48 51.68 L25.84 43.52 L20.4 43.52 Q14.96 43.52 14.96 38.08 Z" fill="none" stroke="url(#na)" stroke-width="3.4" stroke-linejoin="round"/>
+        <path d="M27.2 31.28 L31.96 36.04 L40.8 25.16" fill="none" stroke="url(#na)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M54.4 6.8 Q55.76 11.56 60.52 12.92 Q55.76 14.28 54.4 19.04 Q53.04 14.28 48.28 12.92 Q53.04 11.56 54.4 6.8 Z" fill="url(#na)"/>
+      </svg>
+    </div>
     <div class="admin-login-title">Адмін-панель</div>
     <div class="admin-login-sub">Введіть дані для входу</div>
 
@@ -502,11 +100,11 @@ body {
     <label class="field-label" for="adminPassInput">Пароль</label>
     <div class="field-wrap">
       <input type="password" class="field-input" id="adminPassInput" placeholder="••••••••" autocomplete="current-password">
-      <button class="field-toggle" id="adminPassToggle" type="button">👁</button>
+      <button class="field-toggle" id="adminPassToggle" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </div>
 
-    <button class="btn-admin-login" id="adminLoginBtn" type="button">🔓 Увійти</button>
-    <div class="admin-login-error" id="adminLoginError">❌ Невірний логін або пароль</div>
+    <button class="btn-admin-login" id="adminLoginBtn" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg> Увійти</button>
+    <div class="admin-login-error" id="adminLoginError"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Невірний логін або пароль</div>
     <a class="admin-back-link" id="adminBackLink">← Повернутись на головну</a>
   </div>
 </div>
@@ -516,16 +114,97 @@ body {
   <div class="admin-header">
     <div class="admin-header-badge">ADMIN</div>
     <div class="admin-header-title">ClearText AI — Керування</div>
+    <span class="term-chip term-chip--fail" id="adminAlertChip" style="display:none"></span>
+    <button class="btn-admin-logout" id="adminThemeBtn" type="button" title="Світла/темна тема адмінки" style="background:rgba(96,165,250,0.08);border-color:rgba(96,165,250,0.3);color:var(--adm-accent2)"><svg id="adminThemeIcon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
+    <span class="admin-term-clock" id="admTermClock">--:--:--</span>
     <button class="btn-admin-logout" id="adminLogoutBtn" type="button">Вийти</button>
   </div>
 
   <div class="admin-body">
 
+    <!-- Maintenance mode section -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title">
+          <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span> Технічні роботи
+          <span class="status-dot off" id="maintenanceStatusDot" style="display:none"></span>
+        </div>
+      </div>
+      <div class="admin-section-body">
+        <div class="info-box">Коли увімкнено — застосунок вимикається для всіх користувачів, і замість форми виправлення тексту вони бачать повідомлення про технічні роботи. Використовуйте це під час обслуговування.</div>
+        <div class="admin-row" style="align-items:center;justify-content:space-between">
+          <div id="maintenanceStatusLabel" style="font-weight:800;font-size:14px">Вимкнено — застосунок працює</div>
+          <label class="model-toggle">
+            <input type="checkbox" id="maintenanceToggle">
+            <span class="model-toggle-slider"></span>
+          </label>
+        </div>
+        <div class="admin-success-msg" id="maintenanceSavedMsg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Стан оновлено!</div>
+      </div>
+    </div>
+
+    <!-- Daily limit section -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Денний ліміт запитів
+          <span class="status-dot off" id="limitStatusDot" style="display:none"></span>
+        </div>
+      </div>
+      <div class="admin-section-body">
+        <div class="info-box">Коли увімкнено — після досягнення ліміту запитів за поточну добу користувачі бачитимуть повідомлення про вичерпаний ліміт замість виправлення тексту. За замовчуванням вимкнено, ліміту немає.</div>
+        <div class="admin-row" style="align-items:center;justify-content:space-between">
+          <div id="limitStatusLabel" style="font-weight:800;font-size:14px">Вимкнено — без обмежень</div>
+          <label class="model-toggle">
+            <input type="checkbox" id="limitToggle">
+            <span class="model-toggle-slider"></span>
+          </label>
+        </div>
+        <div class="admin-row">
+          <div class="admin-key-wrap" style="flex:1;min-width:120px">
+            <input type="number" class="admin-key-input" id="limitValueInput" min="1" step="1" placeholder="напр. 500">
+          </div>
+          <button class="btn-save" id="saveLimitBtn" type="button">Зберегти</button>
+        </div>
+        <div class="admin-success-msg" id="limitSavedMsg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Ліміт збережено!</div>
+      </div>
+    </div>
+
+    <!-- Announcement banner section -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a2 2 0 1 1-3.2 2.4"/></svg></span> Оголошення (банер)
+          <span class="status-dot off" id="bannerStatusDot" style="display:none"></span>
+        </div>
+      </div>
+      <div class="admin-section-body">
+        <div class="info-box">Коли увімкнено — коротке повідомлення показується вгорі застосунку для всіх користувачів (наприклад, про технічні роботи чи оновлення). За замовчуванням вимкнено — нічого не показується.</div>
+        <div class="admin-row" style="align-items:center;justify-content:space-between">
+          <div id="bannerStatusLabel" style="font-weight:800;font-size:14px">Вимкнено — банер не показується</div>
+          <label class="model-toggle">
+            <input type="checkbox" id="bannerToggle">
+            <span class="model-toggle-slider"></span>
+          </label>
+        </div>
+        <div class="admin-row">
+          <div class="admin-key-wrap" style="flex:1;min-width:160px">
+            <input type="text" class="admin-key-input" id="bannerTextInput" placeholder="Текст оголошення…" maxlength="140">
+          </div>
+          <select class="admin-key-input" id="bannerTypeSelect" style="max-width:130px">
+            <option value="info">Інфо</option>
+            <option value="warn">Попередження</option>
+            <option value="ok">Успіх</option>
+          </select>
+          <button class="btn-save" id="saveBannerBtn" type="button">Зберегти</button>
+        </div>
+        <div class="admin-success-msg" id="bannerSavedMsg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Банер збережено!</div>
+      </div>
+    </div>
+
     <!-- API Key section -->
     <div class="admin-section">
       <div class="admin-section-header">
         <div class="admin-section-title">
-          <span>🔑</span> Google Gemini API ключ
+          <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span> Google Gemini API ключ
           <span class="status-dot" id="apiStatusDot" style="display:none"></span>
         </div>
       </div>
@@ -535,17 +214,17 @@ body {
           <div class="admin-key-wrap">
             <input type="password" class="admin-key-input" id="adminApiKeyInput" placeholder="AIzaSy...">
           </div>
-          <button class="field-toggle" id="adminApiKeyToggle" style="position:static;transform:none;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;" type="button">👁</button>
-          <button class="btn-save" id="saveApiKeyBtn" type="button">💾 Зберегти</button>
+          <button class="field-toggle" id="adminApiKeyToggle" style="position:static;transform:none;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          <button class="btn-save" id="saveApiKeyBtn" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Зберегти</button>
         </div>
-        <div class="admin-success-msg" id="apiKeySavedMsg">✅ API ключ збережено!</div>
+        <div class="admin-success-msg" id="apiKeySavedMsg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> API ключ збережено!</div>
       </div>
     </div>
 
     <!-- Models section -->
     <div class="admin-section">
       <div class="admin-section-header">
-        <div class="admin-section-title"><span>🤖</span> Моделі Gemini</div>
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span> Моделі Gemini</div>
       </div>
       <div class="admin-section-body">
         <div class="models-list" id="modelsList"></div>
@@ -553,14 +232,30 @@ body {
           <input type="text" class="model-add-input" id="newModelInput" placeholder="Додати модель: gemini-...">
           <button class="btn-add-model" id="addModelBtn" type="button">+ Додати</button>
         </div>
-        <div class="admin-success-msg" id="modelsSavedMsg">✅ Моделі збережено!</div>
+        <div class="admin-success-msg" id="modelsSavedMsg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Моделі збережено!</div>
+      </div>
+    </div>
+
+    <!-- Templates editor section -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span> Редактор шаблонів</div>
+      </div>
+      <div class="admin-section-body">
+        <div class="info-box">Готові фрази, які користувачі бачать на вкладці «Шаблони». Зміни зберігаються централізовано — оновлюються для всіх без нового деплою коду.</div>
+        <div id="templatesEditorList"></div>
+        <div class="admin-row" style="gap:8px">
+          <button class="btn-save btn-term" id="addTemplateCatBtn" type="button">+ Додати категорію</button>
+          <button class="btn-save" id="saveTemplatesBtn" type="button">Зберегти шаблони</button>
+        </div>
+        <div class="admin-success-msg" id="templatesSavedMsg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Шаблони збережено!</div>
       </div>
     </div>
 
     <!-- Credentials section -->
     <div class="admin-section">
       <div class="admin-section-header">
-        <div class="admin-section-title"><span>👤</span> Дані для входу в адмін-панель</div>
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Дані для входу в адмін-панель</div>
       </div>
       <div class="admin-section-body">
         <div class="cred-grid">
@@ -577,9 +272,203 @@ body {
             <input type="password" class="admin-key-input" id="newAdminPassConfirm" placeholder="повторіть пароль" autocomplete="new-password">
           </div>
         </div>
-        <button class="btn-save" id="saveCredsBtn" type="button" style="align-self:flex-start">💾 Зберегти дані входу</button>
-        <div class="admin-success-msg" id="credsSavedMsg">✅ Дані для входу оновлено!</div>
+        <button class="btn-save" id="saveCredsBtn" type="button" style="align-self:flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Зберегти дані входу</button>
+        <div class="admin-success-msg" id="credsSavedMsg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Дані для входу оновлено!</div>
         <div class="error-box" id="credsErrorBox" style="display:none;margin-top:0"></div>
+      </div>
+    </div>
+
+
+      <!-- СТАТИСТИКА -->
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Статистика</div>
+        </div>
+        <div class="admin-section-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <div class="stat-box"><div class="stat-val" id="statTotal">—</div><div class="stat-label">Запитів сьогодні</div></div>
+            <div class="stat-box"><div class="stat-val" id="statChanges">—</div><div class="stat-label">Змін зроблено</div></div>
+            <div class="stat-box"><div class="stat-val" id="statNoChange">—</div><div class="stat-label">Без помилок</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="stat-box"><div class="stat-val" id="statLatency">—</div><div class="stat-label">Сер. затримка</div></div>
+            <div class="stat-box"><div class="stat-val" id="statBlocked">—</div><div class="stat-label">Заблоковано (SAFETY)</div></div>
+          </div>
+          <div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:14px;padding:14px 16px;margin-top:4px">
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--green);margin-bottom:8px;display:flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5C9.5 8.1 10.6 7 12 7s2.5 1.1 2.5 2.5S12 12 12 12s-2.5 1.1-2.5 2.5S10.6 17 12 17s2.5-1.1 2.5-2.5"/></svg> Економія (якби платно)</div>
+            <div style="display:flex;gap:16px;flex-wrap:wrap">
+              <div><span style="font-size:20px;font-weight:900;color:var(--green)" id="statCostUsd">—</span> <span style="font-size:11px;color:var(--dim)">USD сьогодні</span></div>
+              <div><span style="font-size:20px;font-weight:900;color:var(--green)" id="statCostUah">—</span> <span style="font-size:11px;color:var(--dim)">грн сьогодні</span></div>
+            </div>
+            <div style="font-size:11px;color:var(--dim);margin-top:6px">Реальна ціна залежно від моделі • 1 USD = <span id="statUahRate">—</span> ₴</div><div id="statModelInfo" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">—</div>
+          </div>
+          <button class="btn-save" id="loadStatsBtn" type="button" style="align-self:flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg> Оновити</button>
+        </div>
+      </div>
+
+    <!-- Period stats section -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></span> Статистика за період</div>
+      </div>
+      <div class="admin-section-body">
+        <div class="period-tabs">
+          <button class="period-tab active" data-days="1" type="button">Сьогодні</button>
+          <button class="period-tab" data-days="7" type="button">7 днів</button>
+          <button class="period-tab" data-days="30" type="button">30 днів</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div class="stat-box"><div class="stat-val" id="periodTotal">—</div><div class="stat-label">Запитів за період</div></div>
+          <div class="stat-box"><div class="stat-val" id="periodAvg">—</div><div class="stat-label">В середньому/день</div></div>
+          <div class="stat-box"><div class="stat-val" id="periodCost">—</div><div class="stat-label">Витрати (USD)</div></div>
+        </div>
+        <div class="bar-chart" id="periodBarChart"></div>
+        <div class="admin-row" style="gap:8px">
+          <button class="btn-save btn-term" id="periodExportBtn" type="button">Експорт CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hourly breakdown -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Погодинний розподіл (сьогодні)</div>
+        <span class="term-chip term-chip--btn" id="hourlyRefreshBtn">оновити</span>
+      </div>
+      <div class="admin-section-body">
+        <div class="bar-chart" id="hourlyBarChart"></div>
+      </div>
+    </div>
+
+    <!-- Diagnostics section -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span> Діагностика системи</div>
+        <span class="term-chip" id="diagOverallStatus">CHECKING…</span>
+      </div>
+      <div class="admin-section-body">
+        <div class="diag-grid">
+          <div class="diag-item"><span class="diag-label">Firestore</span><span class="diag-value" id="diagFirebaseStatus">—</span></div>
+          <div class="diag-item"><span class="diag-label">Затримка БД</span><span class="diag-value" id="diagLatency">—</span></div>
+          <div class="diag-item"><span class="diag-label">Мережа</span><span class="diag-value" id="diagOnline">—</span></div>
+          <div class="diag-item"><span class="diag-label">Service Worker</span><span class="diag-value" id="diagSW">—</span></div>
+          <div class="diag-item"><span class="diag-label">Режим показу</span><span class="diag-value" id="diagDisplayMode">—</span></div>
+          <div class="diag-item"><span class="diag-label">Платформа</span><span class="diag-value" id="diagPlatform">—</span></div>
+          <div class="diag-item"><span class="diag-label">Сесія триває</span><span class="diag-value" id="diagSessionSince">00:00</span></div>
+          <div class="diag-item"><span class="diag-label">Локальний час</span><span class="diag-value" id="diagClock">—</span></div>
+          <div class="diag-item"><span class="diag-label">Версія SW кешу</span><span class="diag-value" id="diagSWVersion">—</span></div>
+        </div>
+        <div class="diag-ua" id="diagUA">—</div>
+        <div class="admin-row" style="gap:8px">
+          <button class="btn-save btn-term" id="diagRefreshBtn" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg> Оновити діагностику</button>
+          <button class="btn-save btn-term" id="diagUpdateSwBtn" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg> Оновити SW</button>
+          <button class="btn-save btn-term" id="diagCopyBtn" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Копіювати</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin test corrector -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></span> Тест виправлення тексту</div>
+      </div>
+      <div class="admin-section-body">
+        <div class="info-box">Прогонить речення крізь ту саму AI-логіку, що й застосунок користувача, але результат ніде не зберігається і не впливає на публічну статистику чи вигляд застосунку.</div>
+        <textarea class="json-view" id="adminTestInput" style="min-height:70px;color:var(--adm-text)" placeholder="я вчора ходив магазін купляв хліб"></textarea>
+        <div class="admin-row" style="gap:8px">
+          <select class="admin-key-input" id="adminTestModelSelect" style="flex:1;min-width:160px"></select>
+          <button class="btn-save btn-term" id="adminTestRunBtn" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Запустити тест</button>
+        </div>
+        <div class="term-console" id="adminTestResult" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- API connection tester -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span> Тест Gemini API</div>
+      </div>
+      <div class="admin-section-body">
+        <div class="info-box">Перевіряє ключ із поля вище окремим легким запитом (список моделей). Не використовує і не змінює логіку виправлення тексту для користувачів.</div>
+        <button class="btn-save btn-term" id="testApiKeyBtn" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Перевірити з'єднання</button>
+        <div class="term-console" id="apiTestResult" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Raw settings JSON -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span> Сирі дані налаштувань (JSON)</div>
+      </div>
+      <div class="admin-section-body">
+        <div class="info-box">Технічний перегляд і резервне копіювання поточних налаштувань Firestore. Імпорт повністю перезаписує документ налаштувань.</div>
+        <textarea class="json-view" id="rawSettingsJson" readonly spellcheck="false"></textarea>
+        <div class="admin-row" style="gap:8px">
+          <button class="btn-save btn-term" id="refreshJsonBtn" type="button">Оновити</button>
+          <button class="btn-save btn-term" id="exportJsonBtn" type="button">Експорт .json</button>
+          <label class="btn-save btn-term" id="importJsonLabel" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin:0">Імпорт .json<input type="file" id="importJsonInput" accept="application/json" style="display:none"></label>
+        </div>
+        <div class="admin-success-msg" id="jsonSavedMsg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Налаштування імпортовано!</div>
+      </div>
+    </div>
+
+    <!-- Persistent audit log -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg></span> Історія змін налаштувань</div>
+      </div>
+      <div class="admin-section-body">
+        <div class="info-box">Постійний журнал (Firestore) — хто і коли змінював налаштування. На відміну від журналу подій сесії нижче, зберігається назавжди і видно з будь-якого пристрою.</div>
+        <div class="term-console" id="auditLog"></div>
+      </div>
+    </div>
+
+    <!-- Activity log -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></span> Журнал подій сесії</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="term-chip term-chip--btn" id="exportLogBtn">export</span>
+          <span class="term-chip term-chip--btn" id="clearLogBtn">clear</span>
+        </div>
+      </div>
+      <div class="admin-section-body">
+        <div class="admin-row" style="gap:8px">
+          <input type="text" class="model-add-input" id="logSearchInput" placeholder="Пошук у журналі…" style="flex:1;min-width:140px">
+          <select class="model-add-input" id="logFilterSelect" style="max-width:150px">
+            <option value="">Усі типи</option>
+            <option value="ok">Успіх</option>
+            <option value="fail">Помилка</option>
+            <option value="info">Інфо</option>
+          </select>
+        </div>
+        <div class="term-console" id="activityLog"></div>
+      </div>
+    </div>
+
+    <!-- Danger zone -->
+    <div class="admin-section admin-section--danger">
+      <div class="admin-section-header">
+        <div class="admin-section-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Небезпечна зона</div>
+      </div>
+      <div class="admin-section-body">
+        <div class="info-box info-box--danger">Дії нижче незворотні та стосуються лише даних (Firestore / цей пристрій) — код застосунку для користувачів вони не змінюють.</div>
+        <div class="danger-row">
+          <div><div class="danger-title">Скинути статистику за сьогодні</div><div class="danger-sub">Обнулить лічильники запитів і вартості за поточну дату</div></div>
+          <button class="btn-danger" id="resetStatsBtn" type="button">Скинути</button>
+        </div>
+        <div class="danger-row">
+          <div><div class="danger-title">Відновити моделі за замовчуванням</div><div class="danger-sub">Перезапише список моделей стандартним набором</div></div>
+          <button class="btn-danger" id="resetModelsBtn" type="button">Відновити</button>
+        </div>
+        <div class="danger-row">
+          <div><div class="danger-title">Відновити шаблони за замовчуванням</div><div class="danger-sub">Перезапише фрази на вкладці «Шаблони» стандартним набором</div></div>
+          <button class="btn-danger" id="resetTemplatesBtn" type="button">Відновити</button>
+        </div>
+        <div class="danger-row">
+          <div><div class="danger-title">Скинути дані входу адміна</div><div class="danger-sub">Логін/пароль повернуться до admin / admin123 на цьому пристрої</div></div>
+          <button class="btn-danger" id="resetCredsBtn" type="button">Скинути</button>
+        </div>
       </div>
     </div>
 
@@ -589,7 +478,20 @@ body {
 <!-- ── APP ── -->
 <div id="app-screen">
   <div class="app-header">
-    <div class="app-header-icon">✍️</div>
+    <div class="ct-logo ct-logo--header">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="nh" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#8b6cff"/>
+            <stop offset="100%" stop-color="#ff6aa0"/>
+          </linearGradient>
+        </defs>
+        <rect width="36" height="36" rx="8.64" fill="#0d0919"/>
+        <path d="M7.92 12.24 Q7.92 9.36 10.8 9.36 L25.2 9.36 Q28.08 9.36 28.08 12.24 L28.08 20.16 Q28.08 23.04 25.2 23.04 L18 23.04 L12.96 27.36 L13.68 23.04 L10.8 23.04 Q7.92 23.04 7.92 20.16 Z" fill="none" stroke="url(#nh)" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M14.4 16.56 L16.92 19.08 L21.6 13.32" fill="none" stroke="url(#nh)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M28.8 3.6 Q29.52 6.12 32.04 6.84 Q29.52 7.56 28.8 10.08 Q28.08 7.56 25.56 6.84 Q28.08 6.12 28.8 3.6 Z" fill="url(#nh)"/>
+      </svg>
+    </div>
     <div class="app-header-info">
       <div class="app-header-title">ClearText AI</div>
       <div class="app-header-sub">Виправлення тексту</div>
@@ -597,638 +499,167 @@ body {
     <select class="model-sel" id="modelSelect"></select>
   </div>
 
-  <div class="app-body">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><span>✏️</span> Ваш текст</div>
-        <div class="char-count" id="charCount">0 / 800</div>
-      </div>
-      <textarea id="text-input" placeholder="Напишіть речення яке хочете виправити…&#10;Наприклад: «я вчора ходив магазін купляв хліб і молоко»"></textarea>
-
-    </div>
-
-    <button class="btn-fix" id="fixBtn" type="button">
-      <span class="btn-label">✦ Виправити текст</span>
-      <div class="spinner"></div>
-    </button>
-
-    <div class="error-box" id="errorBox"></div>
-
-    <div class="card" id="result-card">
-      <div class="card-header">
-        <div class="card-title"><span>✅</span> Виправлений текст</div>
-      </div>
-      <div class="result-text" id="result-text"></div>
-      <div class="result-actions">
-        <button class="act-btn" id="copyBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-        <button class="act-btn" id="useBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-        <button class="act-btn" id="clearBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
-      </div>
-      <div class="changes-header">
-        <span>🔍 Зміни</span>
-        <div class="badge" id="changes-badge">0</div>
-      </div>
-      <div id="changes-list"></div>
-    </div>
-
-    <div class="history-section" id="historySection" style="display:none">
-      <div class="history-title">
-        <span>🕓 Останні виправлення</span>
-        <button class="history-clear" id="historyClearBtn" type="button">очистити</button>
-      </div>
-      <div id="historyList"></div>
-    </div>
+  <div class="app-banner" id="appBanner" style="display:none">
+    <span class="app-banner-icon" id="appBannerIcon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+    <span class="app-banner-text" id="appBannerText"></span>
   </div>
+
+  <div class="app-body">
+
+    <!-- ═══ TAB: ВИПРАВЛЕННЯ ТЕКСТУ ═══ -->
+    <div class="tab-panel active" id="tab-fix">
+      <div class="fix-hero">
+        <div class="fix-brand">
+          <div class="ct-logo ct-logo--hero">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="nh-hero" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#8b6cff"/>
+            <stop offset="100%" stop-color="#ff6aa0"/>
+          </linearGradient>
+        </defs>
+        <rect width="36" height="36" rx="8.64" fill="#0d0919"/>
+        <path d="M7.92 12.24 Q7.92 9.36 10.8 9.36 L25.2 9.36 Q28.08 9.36 28.08 12.24 L28.08 20.16 Q28.08 23.04 25.2 23.04 L18 23.04 L12.96 27.36 L13.68 23.04 L10.8 23.04 Q7.92 23.04 7.92 20.16 Z" fill="none" stroke="url(#nh-hero)" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M14.4 16.56 L16.92 19.08 L21.6 13.32" fill="none" stroke="url(#nh-hero)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M28.8 3.6 Q29.52 6.12 32.04 6.84 Q29.52 7.56 28.8 10.08 Q28.08 7.56 25.56 6.84 Q28.08 6.12 28.8 3.6 Z" fill="url(#nh-hero)"/>
+      </svg>
+    </div>
+          <div class="fix-brand-text">
+            <div class="app-header-title">ClearText AI</div>
+            <div class="app-header-sub">Виправлення тексту</div>
+          </div>
+        </div>
+        <div class="fix-hero-title">Пишіть як уміється</div>
+        <div class="fix-hero-sub">Виправлю помилки й поясню кожну зміну</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></span> Ваш текст</div>
+        </div>
+        <textarea id="text-input" placeholder="Напишіть речення яке хочете виправити…&#10;Наприклад: «я вчора ходив магазін купляв хліб і молоко»"></textarea>
+        <div class="card-footer">
+          <div class="char-count" id="charCount">0 / 800</div>
+          <button class="btn-fix" id="fixBtn" type="button" aria-label="Виправити текст" title="Виправити текст">
+            <span class="btn-label" aria-hidden="true">Виправити</span>
+            <div class="spinner"></div>
+          </button>
+        </div>
+      </div>
+
+      <div class="error-box" id="errorBox"></div>
+
+      <div class="card" id="result-card">
+        <div class="card-header">
+          <div class="card-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> Виправлений текст</div>
+        </div>
+        <div class="result-text" id="result-text"></div>
+        <div class="result-actions">
+          <button class="act-btn" id="copyBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+          <button class="act-btn" id="shareBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+          <button class="act-btn" id="useBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="act-btn" id="clearBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        </div>
+        <div class="changes-header">
+          <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> Зміни
+          <div class="badge" id="changes-badge">0</div>
+        </div>
+        <div id="changes-list"></div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: ШАБЛОНИ ═══ -->
+    <div class="tab-panel" id="tab-templates">
+      <div class="tab-intro">
+        <div class="tab-intro-title">Готові шаблони</div>
+        <div class="tab-intro-sub">Оберіть фразу — вона підставиться у поле виправлення</div>
+      </div>
+      <div id="templates-list"></div>
+    </div>
+
+    <!-- ═══ TAB: СПІЛКУВАННЯ (озвучити / копіювати / поділитися) ═══ -->
+    <div class="tab-panel" id="tab-speak">
+      <div class="tab-intro">
+        <div class="tab-intro-title">Спілкування (БЕТА)</div>
+        <div class="tab-intro-sub">Прочитайте текст уголос або покажіть його співрозмовнику</div>
+      </div>
+
+      <div class="card speak-card" id="speakContent">
+        <div class="card-header">
+          <div class="card-title"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> Текст для озвучення</div>
+          <button class="speak-goto-fix-link" id="speakGotoFixBtn" type="button">З «Виправлення»</button>
+        </div>
+        <textarea class="speak-textarea" id="speakText" placeholder="Напишіть текст тут або перенесіть його з вкладки «Виправлення»…"></textarea>
+
+        <div class="speak-actions speak-actions--icon">
+          <button class="speak-action-btn speak-action-btn--primary speak-action-btn--icon-only" id="speakReadBtn" type="button" title="Прочитати вголос" aria-label="Прочитати вголос">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══ РОЗПІЗНАВАННЯ МОВИ СПІВРОЗМОВНИКА ═══ -->
+      <div class="tab-intro" style="margin-top:6px">
+        <div class="tab-intro-title" style="font-size:16px">Що каже співрозмовник</div>
+        <div class="tab-intro-sub">Натисніть мікрофон і дайте телефон людині — її слова з'являться тут текстом</div>
+      </div>
+
+      <div class="card listen-card">
+        <div class="listen-status-row">
+          <span class="listen-status-dot" id="listenStatusDot"></span>
+          <span class="listen-status-text" id="listenStatusText">Не слухає</span>
+        </div>
+
+        <div class="listen-transcript" id="listenTranscript"><span class="listen-placeholder" id="listenPlaceholder">Тут з'явиться розпізнаний текст…</span></div>
+
+        <div class="listen-mic-wrap">
+          <button class="listen-mic-btn" id="listenMicBtn" type="button" title="Почати слухати">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+        </div>
+
+        <div class="speak-actions" id="listenActions" style="display:none">
+          <button class="speak-action-btn speak-action-btn--primary" id="listenUseBtn" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+            <span>Виправити цей текст</span>
+          </button>
+          <button class="speak-action-btn" id="listenCopyBtn" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Копіювати</span>
+          </button>
+          <button class="speak-action-btn" id="listenClearBtn" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            <span>Очистити</span>
+          </button>
+        </div>
+
+        <div class="listen-unsupported" id="listenUnsupported" style="display:none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Розпізнавання голосу не підтримується у цьому браузері. Спробуйте Chrome (Android або комп'ютер).
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ TAB BAR ═══ -->
+  <nav class="tab-bar" id="tabBar">
+    <div class="tab-indicator" id="tabIndicator"></div>
+    <button class="tab-btn active" data-tab="tab-fix" type="button" title="Виправлення" aria-label="Виправлення">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+      <span>Виправлення</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-templates" type="button" title="Шаблони" aria-label="Шаблони">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <span>Шаблони</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-speak" type="button" title="Спілкування" aria-label="Спілкування">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+      <span>Спілкування</span>
+    </button>
+  </nav>
 </div>
 
-<script type="module">
-// ══════════════════════════════════════════════
-// FIREBASE INIT
-// ══════════════════════════════════════════════
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAdhdpQno2Pe0lBoS1DlZySJeRzso_WlZE",
-  authDomain: "cleartext-ai-a34a6.firebaseapp.com",
-  databaseURL: "https://cleartext-ai-a34a6-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "cleartext-ai-a34a6",
-  storageBucket: "cleartext-ai-a34a6.firebasestorage.app",
-  messagingSenderId: "897219922207",
-  appId: "1:897219922207:web:4d449dbfdfef501a0c082a"
-};
-
-const fireApp = initializeApp(firebaseConfig);
-const db = getFirestore(fireApp);
-
-// ══════════════════════════════════════════════
-// FIRESTORE HELPERS — зберігають спільні дані
-// ══════════════════════════════════════════════
-async function fsGet(docId) {
-  try {
-    const snap = await getDoc(doc(db, 'app', docId));
-    return snap.exists() ? snap.data() : null;
-  } catch(e) {
-    console.warn('fsGet error:', e);
-    return null;
-  }
-}
-
-async function fsSet(docId, data) {
-  try {
-    await setDoc(doc(db, 'app', docId), data, { merge: true });
-    return true;
-  } catch(e) {
-    console.warn('fsSet error:', e);
-    return false;
-  }
-}
-
-// ══════════════════════════════════════════════
-// LOCAL STORAGE HELPERS — тільки для сесії адміна
-// ══════════════════════════════════════════════
-const KEYS = {
-  ADMIN_USER: 'ct_admin_user',
-  ADMIN_PASS: 'ct_admin_pass',
-  ADMIN_SES:  'ct_admin_session',
-};
-
-const DEFAULT_ADMIN = { user: 'admin', pass: 'admin123' };
-
-const DEFAULT_MODELS = [
-  { id: 'gemini-3.1-flash-lite-preview', label: '3.1 Flash Lite', enabled: true  },
-  { id: 'gemini-2.5-flash', label: '2.5 Flash', enabled: true  },
-  { id: 'gemini-2.0-flash', label: '2.0 Flash', enabled: true  },
-  { id: 'gemini-2.5-pro',   label: '2.5 Pro',   enabled: false },
-];
-
-function lsGet(key, fallback = null) {
-  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : fallback; }
-  catch { return fallback; }
-}
-function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
-
-// Кеш щоб не робити зайвих запитів до Firestore
-let _cachedSettings = null;
-
-async function getSettings() {
-  if (_cachedSettings) return _cachedSettings;
-  const data = await fsGet('settings');
-  _cachedSettings = data || { apiKey: '', models: DEFAULT_MODELS };
-  return _cachedSettings;
-}
-
-function invalidateCache() { _cachedSettings = null; }
-
-function getAdminUser(){ return lsGet(KEYS.ADMIN_USER, DEFAULT_ADMIN.user); }
-function getAdminPass(){ return lsGet(KEYS.ADMIN_PASS, DEFAULT_ADMIN.pass); }
-
-function isAdminSession() { return sessionStorage.getItem(KEYS.ADMIN_SES) === 'ok'; }
-function setAdminSession(v) {
-  if (v) sessionStorage.setItem(KEYS.ADMIN_SES, 'ok');
-  else sessionStorage.removeItem(KEYS.ADMIN_SES);
-}
-
-function show(id, flex) {
-  const el = document.getElementById(id);
-  el.style.display = flex ? 'flex' : 'block';
-}
-function hide(id) { document.getElementById(id).style.display = 'none'; }
-
-// ══════════════════════════════════════════════
-// ROUTING
-// ══════════════════════════════════════════════
-async function route() {
-  const url = window.location.href;
-  const goAdmin = window.location.search.includes('admin') ||
-                  window.location.hash === '#admin' ||
-                  url.includes('%3Fadmin');
-
-  if (goAdmin) {
-    if (isAdminSession()) {
-      await showAdmin();
-    } else {
-      showAdminLogin();
-    }
-  } else {
-    // Показуємо лоадер поки перевіряємо ключ
-    show('no-api-screen', true);
-    const settings = await getSettings();
-    if (settings.apiKey) {
-      showApp(settings);
-    } else {
-      // Залишаємо no-api-screen
-    }
-  }
-}
-
-window.addEventListener('hashchange', route);
-
-// ══════════════════════════════════════════════
-// SCREENS
-// ══════════════════════════════════════════════
-function showAdminLogin() {
-  hide('no-api-screen');
-  hide('admin-screen');
-  hide('app-screen');
-  show('admin-login-screen', true);
-}
-
-async function showAdmin() {
-  hide('no-api-screen');
-  hide('admin-login-screen');
-  hide('app-screen');
-  show('admin-screen', true);
-  await renderAdmin();
-}
-
-function showApp(settings) {
-  hide('no-api-screen');
-  hide('admin-login-screen');
-  hide('admin-screen');
-  show('app-screen', true);
-  renderAppModels(settings.models || DEFAULT_MODELS);
-  document.getElementById('text-input').focus();
-}
-
-// ══════════════════════════════════════════════
-// ADMIN LOGIN
-// ══════════════════════════════════════════════
-document.getElementById('adminPassToggle').onclick = () => {
-  const inp = document.getElementById('adminPassInput');
-  const s = inp.type === 'password';
-  inp.type = s ? 'text' : 'password';
-  document.getElementById('adminPassToggle').textContent = s ? '🙈' : '👁';
-};
-
-document.getElementById('adminLoginBtn').onclick = doAdminLogin;
-document.getElementById('adminPassInput').addEventListener('keydown', e => { if(e.key==='Enter') doAdminLogin(); });
-document.getElementById('adminLoginInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('adminPassInput').focus(); });
-
-document.getElementById('adminBackLink').onclick = () => {
-  const base = window.location.href.split('?')[0].split('#')[0];
-  window.location.replace(base);
-};
-
-function doAdminLogin() {
-  const user = document.getElementById('adminLoginInput').value.trim();
-  const pass = document.getElementById('adminPassInput').value;
-  const errBox = document.getElementById('adminLoginError');
-
-  if (user === getAdminUser() && pass === getAdminPass()) {
-    errBox.style.display = 'none';
-    setAdminSession(true);
-    showAdmin();
-  } else {
-    errBox.style.display = 'block';
-    const card = document.querySelector('.admin-login-card');
-    card.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(0)'}],{duration:300});
-    document.getElementById('adminPassInput').value = '';
-    document.getElementById('adminPassInput').focus();
-  }
-}
-
-// ══════════════════════════════════════════════
-// ADMIN LOGOUT
-// ══════════════════════════════════════════════
-document.getElementById('adminLogoutBtn').onclick = () => {
-  setAdminSession(false);
-  const base = window.location.href.split('?')[0].split('#')[0];
-  window.location.replace(base);
-};
-
-// ══════════════════════════════════════════════
-// ADMIN PANEL
-// ══════════════════════════════════════════════
-async function renderAdmin() {
-  const settings = await getSettings();
-
-  // API key
-  const inp = document.getElementById('adminApiKeyInput');
-  inp.value = settings.apiKey || '';
-  const dot = document.getElementById('apiStatusDot');
-  dot.style.display = 'inline-block';
-  dot.className = 'status-dot' + (settings.apiKey ? '' : ' off');
-
-  renderAdminModels(settings.models || DEFAULT_MODELS);
-}
-
-function renderAdminModels(models) {
-  const list = document.getElementById('modelsList');
-  list.innerHTML = '';
-  models.forEach((m, i) => {
-    const item = document.createElement('div');
-    item.className = 'model-item';
-    item.innerHTML = `
-      <div style="flex:1">
-        <div class="model-item-name">${escHtml(m.id)}</div>
-        ${m.label ? `<div class="model-item-label">${escHtml(m.label)}</div>` : ''}
-      </div>
-      <label class="model-toggle">
-        <input type="checkbox" ${m.enabled ? 'checked' : ''} data-idx="${i}">
-        <span class="model-toggle-slider"></span>
-      </label>
-      <button class="btn-del-model" data-idx="${i}" title="Видалити">✕</button>`;
-    list.appendChild(item);
-  });
-
-  list.querySelectorAll('.model-toggle input').forEach(cb => {
-    cb.addEventListener('change', async () => {
-      const settings = await getSettings();
-      const mods = settings.models || DEFAULT_MODELS;
-      mods[+cb.dataset.idx].enabled = cb.checked;
-      await fsSet('settings', { models: mods });
-      invalidateCache();
-      showTmpMsg('modelsSavedMsg');
-    });
-  });
-
-  list.querySelectorAll('.btn-del-model').forEach(btn => {
-    btn.onclick = async () => {
-      const settings = await getSettings();
-      const mods = settings.models || DEFAULT_MODELS;
-      mods.splice(+btn.dataset.idx, 1);
-      await fsSet('settings', { models: mods });
-      invalidateCache();
-      const s2 = await getSettings();
-      renderAdminModels(s2.models || DEFAULT_MODELS);
-      showTmpMsg('modelsSavedMsg');
-    };
-  });
-}
-
-// Toggle API key visibility
-document.getElementById('adminApiKeyToggle').onclick = () => {
-  const inp = document.getElementById('adminApiKeyInput');
-  const s = inp.type === 'password';
-  inp.type = s ? 'text' : 'password';
-  document.getElementById('adminApiKeyToggle').textContent = s ? '🙈' : '👁';
-};
-
-// Save API key → Firestore
-document.getElementById('saveApiKeyBtn').onclick = async () => {
-  const val = document.getElementById('adminApiKeyInput').value.trim();
-  const btn = document.getElementById('saveApiKeyBtn');
-  btn.textContent = '⏳ Збереження...';
-  btn.disabled = true;
-
-  const ok = await fsSet('settings', { apiKey: val });
-  invalidateCache();
-
-  const dot = document.getElementById('apiStatusDot');
-  dot.className = 'status-dot' + (val ? '' : ' off');
-  btn.textContent = '💾 Зберегти';
-  btn.disabled = false;
-
-  if (ok) showTmpMsg('apiKeySavedMsg');
-  else {
-    document.getElementById('apiKeySavedMsg').textContent = '❌ Помилка збереження. Перевір правила Firestore.';
-    document.getElementById('apiKeySavedMsg').style.color = 'var(--rose)';
-    document.getElementById('apiKeySavedMsg').style.display = 'block';
-    setTimeout(() => {
-      document.getElementById('apiKeySavedMsg').style.display = 'none';
-      document.getElementById('apiKeySavedMsg').style.color = '';
-      document.getElementById('apiKeySavedMsg').textContent = '✅ API ключ збережено!';
-    }, 3000);
-  }
-};
-
-// Add model → Firestore
-document.getElementById('addModelBtn').onclick = async () => {
-  const inp = document.getElementById('newModelInput');
-  const val = inp.value.trim();
-  if (!val) return;
-
-  const settings = await getSettings();
-  const mods = settings.models || DEFAULT_MODELS;
-  if (mods.find(m => m.id === val)) { inp.value = ''; return; }
-  mods.push({ id: val, label: '', enabled: true });
-  await fsSet('settings', { models: mods });
-  invalidateCache();
-  renderAdminModels(mods);
-  inp.value = '';
-  showTmpMsg('modelsSavedMsg');
-};
-document.getElementById('newModelInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('addModelBtn').click(); });
-
-// Save admin credentials → localStorage (тільки на пристрої адміна)
-document.getElementById('saveCredsBtn').onclick = () => {
-  const login = document.getElementById('newAdminLogin').value.trim();
-  const pass  = document.getElementById('newAdminPass').value;
-  const pass2 = document.getElementById('newAdminPassConfirm').value;
-  const errBox = document.getElementById('credsErrorBox');
-  errBox.style.display = 'none';
-
-  if (!login) { errBox.textContent = '⚠️ Введіть логін'; errBox.style.display = 'block'; return; }
-  if (pass.length < 6) { errBox.textContent = '⚠️ Пароль мінімум 6 символів'; errBox.style.display = 'block'; return; }
-  if (pass !== pass2) { errBox.textContent = '⚠️ Паролі не збігаються'; errBox.style.display = 'block'; return; }
-
-  lsSet(KEYS.ADMIN_USER, login);
-  lsSet(KEYS.ADMIN_PASS, pass);
-  document.getElementById('newAdminLogin').value = '';
-  document.getElementById('newAdminPass').value = '';
-  document.getElementById('newAdminPassConfirm').value = '';
-  showTmpMsg('credsSavedMsg');
-};
-
-function showTmpMsg(id) {
-  const el = document.getElementById(id);
-  el.style.display = 'block';
-  setTimeout(() => { el.style.display = 'none'; }, 2500);
-}
-
-// ══════════════════════════════════════════════
-// MAIN APP
-// ══════════════════════════════════════════════
-let selectedLang = 'uk';
-let appHistory = [];
-
-function renderAppModels(models) {
-  const sel = document.getElementById('modelSelect');
-  sel.innerHTML = '';
-  models.filter(m => m.enabled).forEach(m => {
-    const opt = document.createElement('option');
-    opt.value = m.id;
-    opt.textContent = m.label || m.id;
-    sel.appendChild(opt);
-  });
-}
-
-document.querySelectorAll('.lang-btn').forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    selectedLang = btn.dataset.lang;
-  };
-});
-
-const textInput = document.getElementById('text-input');
-textInput.addEventListener('input', () => {
-  const len = textInput.value.length;
-  document.getElementById('charCount').textContent = `${len} / 800`;
-  if (len > 800) textInput.value = textInput.value.slice(0, 800);
-});
-
-document.getElementById('fixBtn').onclick = fixText;
-textInput.addEventListener('keydown', e => { if (e.key==='Enter' && e.ctrlKey) fixText(); });
-
-async function fixText() {
-  const text = textInput.value.trim();
-  if (!text) {
-    textInput.animate([{borderColor:'rgba(251,113,133,0.5)'},{borderColor:''}],{duration:400});
-    return;
-  }
-
-  const settings = await getSettings();
-  const apiKey = settings.apiKey;
-  if (!apiKey) {
-    document.getElementById('errorBox').textContent = '⚠️ API ключ не налаштовано. Зверніться до адміністратора.';
-    document.getElementById('errorBox').style.display = 'block';
-    return;
-  }
-
-  const btn = document.getElementById('fixBtn');
-  btn.classList.add('loading');
-  btn.disabled = true;
-  document.getElementById('result-card').style.display = 'none';
-  document.getElementById('errorBox').style.display = 'none';
-
-  const langNote = 'українською мовою';
-
-  const prompt = `Ти — асистент з виправлення тексту для людей з вадами слуху, які пишуть неграмотно.
-
-ВАЖЛИВІ ПРАВИЛА:
-1. Якщо текст англійською — виправити лише граматику, залишити англійською.
-2. Якщо текст будь-якою іншою мовою (російська, суржик, польська тощо) — перекласти та виправити УКРАЇНСЬКОЮ.
-3. Якщо є кальки з російської або суржик — виправити на літературну українську і пояснити що це кальки/суржик.
-4. Якщо текст вже українською — виправити граматику українською.
-5. Зроби речення граматично правильним, зрозумілим і природним.
-
-ТЕКСТ ДЛЯ ВИПРАВЛЕННЯ:
-"${text}"
-
-Відповідай ВИКЛЮЧНО у форматі JSON, без будь-яких пояснень поза JSON:
-{
-  "corrected": "виправлений текст",
-  "changes": [
-    {
-      "before": "помилкове слово або фраза",
-      "after": "правильний варіант",
-      "reason": "коротке пояснення (1 речення)"
-    }
-  ],
-  "noChanges": false
-}
-
-Якщо текст вже правильний українською, поверни: {"corrected": "${text}", "changes": [], "noChanges": true}
-ВАЖЛИВО: відповідай тільки валідним JSON, без markdown і додаткового тексту.`;
-
-  try {
-    const model = document.getElementById('modelSelect').value;
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.3, maxOutputTokens: 1024 }
-        })
-      }
-    );
-    const data = await res.json();
-    if (data.error) { showError(data.error); return; }
-
-    let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    raw = raw.replace(/```json|```/g, '').trim();
-
-    let parsed;
-    try { parsed = JSON.parse(raw); }
-    catch(e) {
-      const match = raw.match(/\{[\s\S]*\}/);
-      if (match) parsed = JSON.parse(match[0]);
-      else throw new Error('Не вдалося розпізнати відповідь AI');
-    }
-
-    showResult(parsed);
-    saveToHistory(text, parsed.corrected);
-
-  } catch(err) {
-    document.getElementById('errorBox').textContent = `⚠️ ${err.message}`;
-    document.getElementById('errorBox').style.display = 'block';
-  } finally {
-    btn.classList.remove('loading');
-    btn.disabled = false;
-  }
-}
-
-function showError(err) {
-  const box = document.getElementById('errorBox');
-  const isQuota = err.message?.toLowerCase().includes('quota');
-  const retry = err.message?.match(/retry in ([\d.]+)s/i);
-  const sec = retry ? Math.ceil(parseFloat(retry[1])) : null;
-  if (isQuota) box.innerHTML = `⚠️ Ліміт вичерпано${sec ? ` — спробуй через ${sec}с` : ''}. Обери іншу модель.`;
-  else if (err.code === 400 || err.code === 403) box.textContent = '🔑 Невірний API ключ. Зверніться до адміністратора.';
-  else box.textContent = `⚠️ ${err.message}`;
-  box.style.display = 'block';
-}
-
-function showResult(data) {
-  const card = document.getElementById('result-card');
-  const resultText = document.getElementById('result-text');
-  const changesList = document.getElementById('changes-list');
-  const badge = document.getElementById('changes-badge');
-  resultText.textContent = data.corrected;
-  changesList.innerHTML = '';
-  if (data.noChanges || data.changes.length === 0) {
-    badge.textContent = '0';
-    changesList.innerHTML = `<div class="no-changes">✅ Текст вже правильний! Помилок не знайдено.</div>`;
-  } else {
-    badge.textContent = data.changes.length;
-    data.changes.forEach(c => {
-      const item = document.createElement('div');
-      item.className = 'change-item';
-      item.innerHTML = `
-        <div class="change-row">
-          <span class="change-before">${escHtml(c.before)}</span>
-          <span class="change-arrow">→</span>
-          <span class="change-after">${escHtml(c.after)}</span>
-        </div>
-        <div class="change-reason">${escHtml(c.reason)}</div>`;
-      changesList.appendChild(item);
-    });
-  }
-  card.style.display = 'block';
-  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-document.getElementById('copyBtn').onclick = async () => {
-  const text = document.getElementById('result-text').textContent;
-  if (!text) return;
-  try { await navigator.clipboard.writeText(text); }
-  catch(e) {
-    const ta = document.createElement('textarea');
-    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
-    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-  }
-  const btn = document.getElementById('copyBtn');
-  btn.innerHTML = '✅'; btn.classList.add('success');
-  setTimeout(() => { btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'; btn.classList.remove('success'); }, 2000);
-};
-
-document.getElementById('useBtn').onclick = () => {
-  const text = document.getElementById('result-text').textContent;
-  if (!text) return;
-  textInput.value = text;
-  textInput.dispatchEvent(new Event('input'));
-  document.getElementById('result-card').style.display = 'none';
-  textInput.focus();
-  textInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-};
-
-document.getElementById('clearBtn').onclick = () => {
-  textInput.value = '';
-  textInput.dispatchEvent(new Event('input'));
-  document.getElementById('result-card').style.display = 'none';
-  document.getElementById('errorBox').style.display = 'none';
-  textInput.focus();
-};
-
-function saveToHistory(original, corrected) {
-  if (original === corrected) return;
-  appHistory.unshift({ original, corrected, time: new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'}) });
-  if (appHistory.length > 10) appHistory.pop();
-  renderHistory();
-}
-
-function renderHistory() {
-  const sec = document.getElementById('historySection');
-  const list = document.getElementById('historyList');
-  if (appHistory.length === 0) { sec.style.display = 'none'; return; }
-  sec.style.display = 'block';
-  list.innerHTML = '';
-  appHistory.forEach(item => {
-    const el = document.createElement('div');
-    el.className = 'hist-item';
-    el.innerHTML = `
-      <div class="hist-original">❌ ${escHtml(item.original)}</div>
-      <div class="hist-fixed">✅ ${escHtml(item.corrected)}</div>
-      <div class="hist-time">${item.time}</div>`;
-    el.onclick = () => {
-      textInput.value = item.original;
-      textInput.dispatchEvent(new Event('input'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-    list.appendChild(el);
-  });
-}
-
-document.getElementById('historyClearBtn').onclick = () => {
-  appHistory = [];
-  renderHistory();
-};
-
-// ══════════════════════════════════════════════
-// SMART ADMIN LINK
-// ══════════════════════════════════════════════
-function getAdminUrl() {
-  const base = window.location.href.split('?')[0].split('#')[0];
-  return window.location.protocol === 'file:' ? base + '#admin' : base + '?admin';
-}
-
-const _link = document.getElementById('goAdminLink');
-if (_link) _link.onclick = () => { window.location.href = getAdminUrl(); };
-
-// ══════════════════════════════════════════════
-// START
-// ══════════════════════════════════════════════
-route();
-</script>
-
+<script type="module" src="script.js?v=20261024l"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
